@@ -1,2 +1,5 @@
 **/__pycache__/
 backend/data/
+**/.vscode/
+frontend/node_modules
+frontend/package-lock.json
