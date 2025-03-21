@@ -1,6 +1,4 @@
 import json
-import jwt
-import time
 from datetime import date
 from utils.models import User
 
@@ -8,13 +6,6 @@ def get_admin_creds() -> dict:
     with open('data/admin-creds.json', 'r') as f:
         creds = json.load(f)
         return creds
-
-def createLoginToken(user_id) -> str:
-    secret_key = str(int(time.time()))
-    to_encode = {'id': user_id}
-
-    token = jwt.encode(to_encode, secret_key)
-    return token
 
 def get_username_from_email(email: str) -> str:
     return email.split('@')[0]

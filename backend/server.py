@@ -1,13 +1,24 @@
-from flask import Flask, jsonify, request
-from utils.models import *
-from utils import commons
-from sqlalchemy import or_
+from utils.imports import *
 
 app = Flask(__name__)
 
+# Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../data/data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
+
+# Jwt Security
+jwt = JWTManager(app)
+
+# Api
+api = Api(app)
+api.add_resource(routes.SubjectApi, '/subjects')
+api.add_resource(routes.ChapterApi, '/chapters')
+api.add_resource(routes.QuestionApi, '/questions')
+api.add_resource(routes.QuizApi, '/quizzes')
+api.add_resource(routes.QuizQuestionApi, '/quiz-questions')
+api.add_resource(routes.UserApi, '/user/<int:user_id>')
+api.add_resource(routes.QuizAttemptApi, '/user/<int:user_id>/quiz-attempts')
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -22,7 +33,7 @@ def login():
         if password == admin_creds['password']:
             return_message['status'] = 'success'
             return_message['user'] = 'admin'
-            return_message['token'] = commons.createLoginToken('admin')
+            return_message['token'] = create_access_token(identity='admin')
 
         else:
             return_message['status'] = 'failed'
@@ -34,7 +45,7 @@ def login():
             if user.check_password(password):
                 return_message['status'] = 'success'
                 return_message['user'] = user.username
-                return_message['token'] = commons.createLoginToken(user.id)
+                return_message['token'] = create_access_token(identity=user.id)
             else:
                 return_message['status'] = 'failed'
                 return_message['info'] = 'Incorrect Password'
@@ -42,7 +53,7 @@ def login():
         else:
             return_message['status'] = 'failed'
             return_message['info'] = 'User Not Found'
-            return_code = 401
+            return_code = 404
     
     return jsonify(return_message), return_code
 
