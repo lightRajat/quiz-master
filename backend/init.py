@@ -2,7 +2,7 @@ from flask import Flask
 from utils.models import *
 import csv
 import os, shutil
-from datetime import date
+from utils.commons import get_date_from_string
 
 def initialize_database():
     with app.app_context():
@@ -182,10 +182,7 @@ def add_sample_binaries():
 
         shutil.copy(src_path, dest_path)
 
-def get_date_from_string(string):
-    date_values = tuple(map(int, string.split('-')))
-    date_object = date(date_values[0], date_values[1], date_values[2])
-    return date_object
+
 
 # check if already initialized
 if os.path.exists('data/data.db'):

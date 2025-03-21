@@ -1,15 +1,21 @@
 <script setup>
-    import { RouterLink } from  'vue-router';
+    import { RouterLink, useRouter } from  'vue-router';
     import { ref } from 'vue';
     import axios from 'axios';
 
     const formElem = ref(null);
+    const router = useRouter();
 
     const handleSubmit = async () => {
         const formData = new FormData(formElem.value);
 
-        const response = await axios.post('/api/signup', formData);
-        console.log(response.data);
+        try {
+            const response = await axios.post('/api/signup', formData);
+            window.showToast(response.data.status, response.data.user);
+            router.push('/');
+        } catch (error) {
+            window.showToast(error.response.data.status, error.response.data.info);
+        }
     };
 </script>
 

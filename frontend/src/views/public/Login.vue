@@ -1,14 +1,27 @@
 <script setup>
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router';
 import { ref } from 'vue';
 import axios from 'axios';
 
 const formElem = ref(null);
+const router = useRouter();
 
 const handleSubmit = async () => {
     const formData = new FormData(formElem.value);
-    const response = await axios.post('api/login', formData);
-    console.log(response.data);
+    try {
+        const response = await axios.post('api/login', formData);
+        if (response.data.user === 'admin') {
+            router.push('/admin'); // TODO
+        } else {
+            router.push(''); // TODO
+        }
+        window.showToast(`Welcome ${response.data.user}`, "enjoy");
+
+        sessionStorage.setItem('token', response.data.token)
+    } catch (error) {
+        window.showToast('Login Failed', error.response.data.info);
+        formElem.value.reset();
+    }
 };
 </script>
 
