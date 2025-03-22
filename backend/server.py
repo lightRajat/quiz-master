@@ -6,19 +6,26 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../data/data.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
+with app.app_context():
+    @event.listens_for(db.engine, "connect")
+    def enable_foreign_key_constraint(dbapi_connection, connection_record):
+        cursor = dbapi_connection.cursor()
+        cursor.execute("PRAGMA foreign_keys = ON;")
+        cursor.close()
 
 # Jwt Security
 app.config['SECRET_KEY'] = "rajat-vue-app"
+app.config['JWT_ACCESS_TOKEN_EXPIRES'] = False
 jwt = JWTManager(app)
 
 # Api
 app.config['UPLOADS_FOLDER'] = 'data/profile-pics'
 api = Api(app)
-api.add_resource(routes.SubjectApi, '/subjects')
-api.add_resource(routes.ChapterApi, '/chapters')
-api.add_resource(routes.QuestionApi, '/questions')
-api.add_resource(routes.QuizApi, '/quizzes')
-api.add_resource(routes.QuizQuestionApi, '/quiz-questions')
+api.add_resource(routes.SubjectApi, '/subjects', '/subject/<int:id>')
+api.add_resource(routes.ChapterApi, '/chapters', '/chapter/<int:id>')
+api.add_resource(routes.QuestionApi, '/questions', '/question/<int:id>')
+api.add_resource(routes.QuizApi, '/quizzes', '/quiz/<int:id>')
+api.add_resource(routes.QuizQuestionApi, '/quiz-questions', '/quiz-question/<int:id>')
 api.add_resource(routes.UserApi, '/user/<int:user_id>')
 api.add_resource(routes.QuizAttemptApi, '/user/<int:user_id>/quiz-attempts')
 

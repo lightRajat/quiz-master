@@ -1,24 +1,35 @@
 from flask_restful import Resource
-from utils import models
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from utils.commons import get_admin_creds, get
+from utils.commons import get
+from utils.http_response import Response
+from utils.mixins import *
+from utils import models
 
-class SubjectApi(Resource):
+class SubjectApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
     def get(self):
         results = models.Subject.query.all()
-        all_subjects = []
+        subjects = []
         for result in results:
             subject = {
                 'id': result.id,
                 'name': result.name,
                 'description': result.description
             }
-            all_subjects.append(subject)
+            subjects.append(subject)
         
-        return {'subject': all_subjects}, 200
+        return Response.RESOURCE_FETCHED(subjects)
+    
+    def post(self):
+        return super().post(models.Subject)
+    
+    def delete(self, id):
+        return super().delete(models.Subject, id)
 
-class ChapterApi(Resource):
+    def put(self, id):
+        return super().put(models.Subject, id)
+
+class ChapterApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
     def get(self):
         subject_id = request.args.get('subject_id')
 
@@ -37,12 +48,19 @@ class ChapterApi(Resource):
             }
             chapters.append(chapter)
         
-        return {'chapters': chapters}, 200
+        return Response.RESOURCE_FETCHED(chapters)
+    
+    def post(self):
+        return super().post(models.Chapter)
+    
+    def delete(self, id):
+        return super().delete(models.Chapter, id)
 
-class QuestionApi(Resource):
+    def put(self, id):
+        return super().put(models.Chapter, id)
+
+class QuestionApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
     def get(self):
-        """Fetch questions, optionally filtered by chapter_id"""
-
         chapter_id = request.args.get('chapter_id')
 
         if chapter_id:
@@ -65,16 +83,24 @@ class QuestionApi(Resource):
             }
             questions.append(question)
         
-        return {'questions': questions}, 200
+        return Response.RESOURCE_FETCHED(questions)
+    
+    def post(self):
+        return super().post(models.Question)
+    
+    def delete(self, id):
+        return super().delete(models.Question, id)
+    
+    def put(self, id):
+        return super().put(models.Question, id)
 
-class QuizApi(Resource):
+class QuizApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
     def get(self):
-        """Fetch quizzes, optionally filtered by either chapter_id or subject_id (but not both)"""
         chapter_id = request.args.get('chapter_id')
         subject_id = request.args.get('subject_id')
 
         if chapter_id and subject_id:
-            return {'status': 'failed', 'info': 'Provide only one filter: chapter_id or subject_id, but not both'}, 400
+            return Response.INVALID_PARAMETERS
 
         if chapter_id:
             results = models.Quiz.query.filter_by(chapter_id=chapter_id).all()
@@ -95,10 +121,18 @@ class QuizApi(Resource):
             }
             quizzes.append(quiz)
 
-        return {'quizzes': quizzes}, 200
+        return Response.RESOURCE_FETCHED(quizzes)
+    
+    def post(self):
+        return super().post(models.Quiz)
+    
+    def delete(self, id):
+        return super().delete(models.Quiz, id)
+    
+    def put(self, id):
+        return super().put(models.Quiz, id)
 
-class QuizQuestionApi(Resource):
-    """Fetch all quiz questions or filter by quiz_id (optional)"""
+class QuizQuestionApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
     def get(self):
         quiz_id = request.args.get('quiz_id')
 
@@ -117,21 +151,30 @@ class QuizQuestionApi(Resource):
             }
             quiz_questions.append(quiz_question)
 
-        return {'quiz_questions': quiz_questions}, 200
+        return Response.RESOURCE_FETCHED(quiz_questions)
+    
+    def post(self):
+        return super().post(models.QuizQuestion)
+    
+    def delete(self, id):
+        return super().delete(models.QuizQuestion, id)
+    
+    def put(self, id):
+        return super().put(models.QuizQuestion, id)
 
 class UserApi(Resource):
     @jwt_required()
     def get(self, user_id: int):
         token_user_id = get_jwt_identity()
         
-        if token_user_id == get_admin_creds()['username']:
+        if token_user_id == 'admin':
             result = models.User.query.get(user_id)
             if not result:
-                return {'status': 'failed', 'info': "User not found"}, 404
+                return Response.USER_NOT_FOUND
         else:
             result = models.User.query.get(token_user_id)
             if result.id != user_id:
-                return {'status': 'failed', 'info': "not authorized"}, 403
+                return Response.UNAUTHORIZED
 
         user = {
             'id': result.id,
@@ -147,20 +190,20 @@ class UserApi(Resource):
         if result.profile_pic:
             user['profile_pic'] = f"uploads/{result.profile_pic}"
 
-        return user, 200
+        return Response.RESOURCE_FETCHED(user)
         
 class QuizAttemptApi(Resource):
     @jwt_required()
     def get(self, user_id):
         token_user_id = get_jwt_identity()
 
-        if token_user_id == get_admin_creds()['username']:
+        if token_user_id == 'admin':
             user = models.User.query.get(user_id)
             if not user:
-                return {'status': 'failed', 'info': "User not found"}, 404
+                return Response.USER_NOT_FOUND
         else:
             if token_user_id != user_id:
-                return {'status': 'failed', 'info': "Not authorized"}, 403
+                return Response.UNAUTHORIZED
         
         results = models.QuizAttempt.query.filter_by(user_id=user_id).all()
 
@@ -174,4 +217,4 @@ class QuizAttemptApi(Resource):
                 'score': result.score
             })
 
-        return {'quiz_attempts': quiz_attempts}, 200
+        return Response.RESOURCE_FETCHED(quiz_attempts)

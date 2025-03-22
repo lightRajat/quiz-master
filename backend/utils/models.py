@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Enum, ForeignKey
+from sqlalchemy import Enum, ForeignKey, UniqueConstraint, CheckConstraint
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -25,7 +25,7 @@ class User(db.Model):
 
 class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), unique=True, nullable=False)
     description = db.Column(db.Text, nullable=True)
 
 class Chapter(db.Model):
@@ -33,6 +33,8 @@ class Chapter(db.Model):
     subject_id = db.Column(db.Integer, ForeignKey('subject.id'), nullable=False)
     name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
+
+    __table_args__ = (UniqueConstraint('subject_id', 'name', name="unique_chapter"), )
 
 class Question(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -45,6 +47,8 @@ class Question(db.Model):
     correct_option = db.Column(Enum('a', 'b', 'c', 'd', name='correct_option_enum'), nullable=False)
     score = db.Column(db.Integer, nullable=False)
 
+    __table_args__ = (UniqueConstraint('chapter_id', 'question', name="unique_question"), )
+
 class Quiz(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     scope = db.Column(Enum('subject', 'chapter', name='quiz_scope_enum'), nullable=False)
@@ -53,11 +57,19 @@ class Quiz(db.Model):
     time = db.Column(db.Integer, nullable=False)
     description = db.Column(db.Text, nullable=True)
 
+    __table_args__ = (
+        CheckConstraint("scope IN ('chapter', 'subject')", name="check_valid_scope"),
+        CheckConstraint("(scope = 'subject' AND subject_id IS NOT NULL AND chapter_id IS NULL) OR (scope = 'chapter' AND chapter_id IS NOT NULL AND subject_id IS NULL)", name="check_scope_ids"),
+    )
+
 class QuizQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     quiz_id = db.Column(db.Integer, ForeignKey('quiz.id'), nullable=False)
     question_id = db.Column(db.Integer, ForeignKey('question.id'), nullable=False)
     order = db.Column(db.Float, nullable=False)
+
+    __table_args__ = (UniqueConstraint('quiz_id', 'question_id', name="unique_quiz_question"), )
+    __table_args__ = (UniqueConstraint('quiz_id', 'order', name="unique_quiz_question_order"), )
 
 class QuizAttempt(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
