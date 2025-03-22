@@ -2,7 +2,7 @@ from flask_restful import Resource
 from utils import models
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from utils.commons import get_admin_creds
+from utils.commons import get_admin_creds, get
 
 class SubjectApi(Resource):
     def get(self):
@@ -138,12 +138,14 @@ class UserApi(Resource):
             'name': result.name,
             'email': result.email,
             'username': result.username,
-            'date_joined': result.date_joined,
-            'profile_pic': result.profile_pic,
+            'date_joined': get(result.date_joined),
             'qualification': result.qualification,
-            'dob': result.dob,
-            'date_account_deleted': result.date_account_deleted
+            'dob': get(result.dob),
+            'date_account_deleted': get(result.date_account_deleted),
+            'profile_pic': ''
         }
+        if result.profile_pic:
+            user['profile_pic'] = f"uploads/{result.profile_pic}"
 
         return user, 200
         
@@ -167,7 +169,7 @@ class QuizAttemptApi(Resource):
             quiz_attempts.append({
                 'id': result.id,
                 'quiz_id': result.quiz_id,
-                'date_attempted': result.date_attempted,
+                'date_attempted': get(result.date_attempted),
                 'time_taken': result.time_taken,
                 'score': result.score
             })

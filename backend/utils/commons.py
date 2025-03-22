@@ -15,7 +15,7 @@ def get_date_from_string(string) -> date:
     date_object = date(date_values[0], date_values[1], date_values[2])
     return date_object
 
-def set_profile_pic(profile, user):
+def save_profile_pic(profile, user):
     if '.' in profile.filename:
         extension = profile.filename[profile.filename.rfind('.') + 1:]
     else:
@@ -32,3 +32,6 @@ def set_profile_pic(profile, user):
 
     user.profile_pic = profile_name
     profile.save(f"data/profile-pics/{profile_name}")
+
+def get(date) -> str:
+    return str(date or '')

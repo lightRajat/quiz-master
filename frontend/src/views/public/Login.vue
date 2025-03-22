@@ -1,26 +1,27 @@
 <script setup>
 import { RouterLink, useRouter } from 'vue-router';
-import { ref } from 'vue';
-import axios from 'axios';
+import { reactive } from 'vue';
+import { loginUser } from '@/utils/auth';
 
-const formElem = ref(null);
+const state = reactive({
+    email: 'admin',
+    password: 'admin'
+});
 const router = useRouter();
 
 const handleSubmit = async () => {
-    const formData = new FormData(formElem.value);
-    try {
-        const response = await axios.post('api/login', formData);
-        if (response.data.user === 'admin') {
-            router.push('/admin'); // TODO
+    const response = await loginUser(state.email, state.password);
+    if (response.status === 'failed') {
+        window.showToast("Login Failed", 'warning', response.info);
+        state.email = '',
+        state.password = ''
+    } else {
+        window.showToast("Successfully Logged In", 'success', `Welcome ${response.user}`);
+        if (response.user === 'admin') {
+            router.push('/admin');
         } else {
-            router.push(''); // TODO
+            router.push(`/user/${response.user}`);
         }
-        window.showToast(`Welcome ${response.data.user}`, "enjoy");
-
-        sessionStorage.setItem('token', response.data.token)
-    } catch (error) {
-        window.showToast('Login Failed', error.response.data.info);
-        formElem.value.reset();
     }
 };
 </script>
@@ -28,15 +29,15 @@ const handleSubmit = async () => {
 <template>
     <h2 class="card-title text-center card-body display-6 mb-0">Login</h2>
     <div class="card-body">
-        <form ref="formElem" @submit.prevent="handleSubmit">
+        <form @submit.prevent="handleSubmit">
             <div class="mb-3">
                 <label class="form-label" for="email">Email</label>
-                <input name="email" type="text" class="form-control" placeholder="or enter your username" id="email"
+                <input v-model="state.email" name="email" type="text" class="form-control" placeholder="or enter your username" id="email"
                     required>
             </div>
             <div class="mb-3">
                 <label class="form-label" for="password">Password</label>
-                <input name="password" type="password" class="form-control"
+                <input v-model="state.password" name="password" type="password" class="form-control"
                     placeholder="Hope you didn't share it with anyone" id="password" required>
             </div>
             <div class="mb-3 text-center">

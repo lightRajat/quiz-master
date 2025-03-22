@@ -11,10 +11,11 @@
 
         try {
             const response = await axios.post('/api/signup', formData);
-            window.showToast(response.data.status, response.data.user);
+            window.showToast(response.data.info, 'primary', "Now Log in with Your Credentials");
             router.push('/');
         } catch (error) {
-            window.showToast(error.response.data.status, error.response.data.info);
+            window.showToast(error.response.data.info, 'warning', "Use Another Email");
+            formElem.value.reset();
         }
     };
 </script>

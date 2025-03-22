@@ -8,9 +8,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 # Jwt Security
+app.config['SECRET_KEY'] = "rajat-vue-app"
 jwt = JWTManager(app)
 
 # Api
+app.config['UPLOADS_FOLDER'] = 'data/profile-pics'
 api = Api(app)
 api.add_resource(routes.SubjectApi, '/subjects')
 api.add_resource(routes.ChapterApi, '/chapters')
@@ -24,46 +26,32 @@ api.add_resource(routes.QuizAttemptApi, '/user/<int:user_id>/quiz-attempts')
 def login():
     email = request.form['email']
     password = request.form['password']
-    return_message = {"status": ""}
-    return_code = 200
-
     admin_creds = commons.get_admin_creds()
 
     if email == admin_creds['username']:
         if password == admin_creds['password']:
-            return_message['status'] = 'success'
-            return_message['user'] = 'admin'
-            return_message['token'] = create_access_token(identity='admin')
+            return Response.USER_LOGGED('admin', create_access_token(identity='admin'))
 
         else:
-            return_message['status'] = 'failed'
-            return_message['info'] = 'incorrect password'
-            return_code = 401
+            return Response.INCORRECT_PASSWORD
     else:
         user = User.query.filter(or_(User.username == email, User.email == email)).first()
         if user:
             if user.check_password(password):
-                return_message['status'] = 'success'
-                return_message['user'] = user.username
-                return_message['token'] = create_access_token(identity=user.id)
+                return Response.USER_LOGGED(user.username, create_access_token(identity=user.id))
             else:
-                return_message['status'] = 'failed'
-                return_message['info'] = 'Incorrect Password'
-                return_code = 401
+                return Response.INCORRECT_PASSWORD
         else:
-            return_message['status'] = 'failed'
-            return_message['info'] = 'User Not Found'
-            return_code = 404
-    
-    return jsonify(return_message), return_code
+            return Response.USER_NOT_FOUND
 
 @app.route('/signup', methods=['POST'])
 def signup():
     data = request.form
 
+    # if user already exists
     user = User.query.filter(or_(User.username == data['email'], User.email == data['email'])).first()
-    if user:
-        return jsonify({'status': "failed", 'info': "user already exists"}), 409
+    if user or commons.get_username_from_email(data['email']) == 'admin':
+        return Response.USER_ALREADY_EXISTS
 
     user = User(
         name = data['name'],
@@ -73,14 +61,28 @@ def signup():
         dob = commons.get_date_from_string(data['dob']) if data['dob'] else None
     )
     user.set_password(data['password'])
-    print(request.files['image'])
     if request.files['image'].filename:
-        commons.set_profile_pic(request.files['image'], user)
+        commons.save_profile_pic(request.files['image'], user)
     
     db.session.add(user)
     db.session.commit()
     
-    return jsonify({'status': 'success', 'user': user.username}), 201
+    return Response.USER_REGISTERED(user.username)
+
+@app.route('/uploads/<string:path>')
+@jwt_required()
+def send_image_file(path: str):
+    token_user_id = get_jwt_identity()
+
+    if token_user_id == commons.get_admin_creds()['username']:
+        if path not in os.listdir(app.config['UPLOADS_FOLDER']):
+            return {'status': 'failed', 'info': "file not found"}, 404
+    else:
+        user = User.query.get(token_user_id)
+        if user.profile_pic != path:
+            return {'status': 'failed', 'info': "not authorized"}, 403
+
+    return send_file(f"{app.config['UPLOADS_FOLDER']}/{path}")
 
 if __name__ == '__main__':
     app.run(debug=True)

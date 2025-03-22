@@ -3,5 +3,5 @@
 </script>
 
 <template>
-    Admin View
+    User View
 </template>
