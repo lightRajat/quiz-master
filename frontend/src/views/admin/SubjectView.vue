@@ -1,0 +1,3 @@
+<template>
+    subject view
+</template>

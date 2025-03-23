@@ -6,19 +6,29 @@ from utils.http_response import Response
 from utils.mixins import *
 
 class SubjectApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
-    def get(self):
-        results = models.Subject.query.all()
-        subjects = []
-        for result in results:
+    def get(self, id=None):
+        if id:
+            result = models.Subject.query.get(id)
+            if not result:
+                return Response.RESOURCE_NOT_FOUND
             subject = {
                 'id': result.id,
                 'name': result.name,
                 'description': result.description
             }
-            subjects.append(subject)
-        
-        return Response.RESOURCE_FETCHED(subjects)
-    
+            return Response.RESOURCE_FETCHED(subject)
+        else:
+            results = models.Subject.query.all()
+            subjects = []
+            for result in results:
+                subject = {
+                    'id': result.id,
+                    'name': result.name,
+                    'description': result.description
+                }
+                subjects.append(subject)
+            return Response.RESOURCE_FETCHED(subjects)
+
     def post(self):
         return super().post(models.Subject)
     
@@ -29,29 +39,38 @@ class SubjectApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
         return super().put(models.Subject, id)
 
 class ChapterApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
-    def get(self):
-        subject_id = request.args.get('subject_id')
-
-        if subject_id:
-            results = models.Chapter.query.filter_by(subject_id = subject_id).all()
-        else:
-            results = models.Chapter.query.all()
-        
-        chapters = []
-        for result in results:
+    def get(self, id=None):
+        if id:
+            result = models.Chapter.query.get(id)
+            if not result:
+                return Response.RESOURCE_NOT_FOUND
             chapter = {
                 'id': result.id,
                 'subject_id': result.subject_id,
                 'name': result.name,
                 'description': result.description
             }
-            chapters.append(chapter)
-        
-        return Response.RESOURCE_FETCHED(chapters)
-    
+            return Response.RESOURCE_FETCHED(chapter)
+        else:
+            subject_id = request.args.get('subject_id')
+            if subject_id:
+                results = models.Chapter.query.filter_by(subject_id=subject_id).all()
+            else:
+                results = models.Chapter.query.all()
+            chapters = []
+            for result in results:
+                chapter = {
+                    'id': result.id,
+                    'subject_id': result.subject_id,
+                    'name': result.name,
+                    'description': result.description
+                }
+                chapters.append(chapter)
+            return Response.RESOURCE_FETCHED(chapters)
+
     def post(self):
         return super().post(models.Chapter)
-    
+
     def delete(self, id):
         return super().delete(models.Chapter, id)
 
@@ -59,16 +78,11 @@ class ChapterApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
         return super().put(models.Chapter, id)
 
 class QuestionApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
-    def get(self):
-        chapter_id = request.args.get('chapter_id')
-
-        if chapter_id:
-            results = models.Question.query.filter_by(chapter_id = chapter_id).all()
-        else:
-            results = models.Question.query.all()
-        
-        questions = []
-        for result in results:
+    def get(self, id=None):
+        if id:
+            result = models.Question.query.get(id)
+            if not result:
+                return Response.RESOURCE_NOT_FOUND
             question = {
                 'id': result.id,
                 'chapter_id': result.chapter_id,
@@ -80,36 +94,44 @@ class QuestionApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
                 'correct_option': result.correct_option,
                 'score': result.score
             }
-            questions.append(question)
-        
-        return Response.RESOURCE_FETCHED(questions)
-    
+            return Response.RESOURCE_FETCHED(question)
+        else:
+            chapter_id = request.args.get('chapter_id')
+            if chapter_id:
+                results = models.Question.query.filter_by(chapter_id=chapter_id).all()
+            else:
+                results = models.Question.query.all()
+            questions = []
+            for result in results:
+                question = {
+                    'id': result.id,
+                    'chapter_id': result.chapter_id,
+                    'question': result.question,
+                    'option_a': result.option_a,
+                    'option_b': result.option_b,
+                    'option_c': result.option_c,
+                    'option_d': result.option_d,
+                    'correct_option': result.correct_option,
+                    'score': result.score
+                }
+                questions.append(question)
+            return Response.RESOURCE_FETCHED(questions)
+
     def post(self):
         return super().post(models.Question)
     
     def delete(self, id):
         return super().delete(models.Question, id)
-    
+
     def put(self, id):
         return super().put(models.Question, id)
 
 class QuizApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
-    def get(self):
-        chapter_id = request.args.get('chapter_id')
-        subject_id = request.args.get('subject_id')
-
-        if chapter_id and subject_id:
-            return Response.INVALID_PARAMETERS
-
-        if chapter_id:
-            results = models.Quiz.query.filter_by(chapter_id=chapter_id).all()
-        elif subject_id:
-            results = models.Quiz.query.filter_by(subject_id=subject_id).all()
-        else:
-            results = models.Quiz.query.all()
-
-        quizzes = []
-        for result in results:
+    def get(self, id=None):
+        if id:
+            result = models.Quiz.query.get(id)
+            if not result:
+                return Response.RESOURCE_NOT_FOUND
             quiz = {
                 'id': result.id,
                 'scope': result.scope,
@@ -118,16 +140,37 @@ class QuizApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
                 'time': result.time,
                 'description': result.description
             }
-            quizzes.append(quiz)
+            return Response.RESOURCE_FETCHED(quiz)
+        else:
+            chapter_id = request.args.get('chapter_id')
+            subject_id = request.args.get('subject_id')
+            if chapter_id and subject_id:
+                return Response.INVALID_PARAMETERS
+            if chapter_id:
+                results = models.Quiz.query.filter_by(chapter_id=chapter_id).all()
+            elif subject_id:
+                results = models.Quiz.query.filter_by(subject_id=subject_id).all()
+            else:
+                results = models.Quiz.query.all()
+            quizzes = []
+            for result in results:
+                quiz = {
+                    'id': result.id,
+                    'scope': result.scope,
+                    'chapter_id': result.chapter_id,
+                    'subject_id': result.subject_id,
+                    'time': result.time,
+                    'description': result.description
+                }
+                quizzes.append(quiz)
+            return Response.RESOURCE_FETCHED(quizzes)
 
-        return Response.RESOURCE_FETCHED(quizzes)
-    
     def post(self):
         return super().post(models.Quiz)
     
     def delete(self, id):
         return super().delete(models.Quiz, id)
-    
+
     def put(self, id):
         return super().put(models.Quiz, id)
 

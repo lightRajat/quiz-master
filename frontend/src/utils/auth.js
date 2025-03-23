@@ -1,5 +1,4 @@
 import axios from "axios";
-import router from "./router";
 
 const loginUser = async (email, passwd) => {
   const formData = new FormData();
@@ -11,6 +10,7 @@ const loginUser = async (email, passwd) => {
   try {
     const response = await axios.post('/api/login', formData);
     sessionStorage.setItem('token', response.data.token);
+    sessionStorage.setItem('user', response.data.user);
     returnMsg.status = 'success';
     returnMsg.user = response.data.user;
   } catch (error) {
@@ -23,8 +23,13 @@ const loginUser = async (email, passwd) => {
 
 const logoutUser = () => {
   sessionStorage.removeItem('token');
-  router.push('/');
+  sessionStorage.removeItem('user');
+  window.showToast('Successfully Logged Out', 'primary');
 }
+
+const getCurrentUser = () => {
+  return sessionStorage.getItem('user');
+};
 
 const api = axios.create({
   baseURL: '/api'
@@ -41,16 +46,24 @@ api.interceptors.request.use((config) => {
 });
 
 api.interceptors.response.use((response) => {
+  if (typeof(response.data === 'string')) {
+    try {
+      response.data = JSON.parse(response.data);
+    } catch (error) {
+      console.error('Error parsing JSON response:', error);
+    }
+  }
   return response;
 }, (error) => {
   if (error.response) {
     const statusCode = error.response.status;
     if (statusCode === 401 || statusCode === 403) {
       sessionStorage.removeItem('token');
-      router.push('/unauthorized');
+      sessionStorage.removeItem('user');
+      window.location.href = '/unauthorized';
     }
   }
   return Promise.reject(error);
 });
 
-export { api, loginUser, logoutUser };
+export { api, loginUser, logoutUser, getCurrentUser };
