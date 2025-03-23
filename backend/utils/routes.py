@@ -4,7 +4,6 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from utils.commons import get
 from utils.http_response import Response
 from utils.mixins import *
-from utils import models
 
 class SubjectApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
     def get(self):

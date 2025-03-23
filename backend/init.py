@@ -7,7 +7,6 @@ from utils.commons import get_date_from_string
 def initialize_database():
     with app.app_context():
         db.create_all()
-    os.rmdir('instance')
 
 def add_sample_data():
     sample_folder = "data/sample-data"
@@ -190,7 +189,8 @@ if os.path.exists('data/data.db'):
     exit(0)
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../data/data.db'
+db_path = os.path.join(os.getcwd(), 'data/data.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 

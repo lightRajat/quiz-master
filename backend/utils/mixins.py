@@ -1,7 +1,7 @@
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from utils.http_response import Response
 from flask import request
-from utils.models import db
+from utils import models
 from sqlalchemy.exc import IntegrityError, StatementError
 
 class UpdateMixin:
@@ -21,7 +21,7 @@ class UpdateMixin:
         try:
             for key, value in data.items():
                 setattr(resource, key, value)
-            db.session.commit()
+            models.db.session.commit()
             return Response.RESOURCE_UPDATED
         except IntegrityError as e:
             error_msg = str(e.orig)
@@ -37,7 +37,7 @@ class UpdateMixin:
             print(f"Error updating resource: {e}")
             return Response.INTERNAL_SERVER_ERROR
         finally:
-            db.session.rollback()
+            models.db.session.rollback()
 
 class PostMixin:
     @jwt_required()
@@ -50,8 +50,8 @@ class PostMixin:
         data = request.get_json()
         try:
             resource = model(**data)
-            db.session.add(resource)
-            db.session.commit()
+            models.db.session.add(resource)
+            models.db.session.commit()
 
             return Response.RESOURCE_CREATED
         except IntegrityError as e:
@@ -70,7 +70,7 @@ class PostMixin:
             print(f"Error creating resource: {e}")
             return Response.INTERNAL_SERVER_ERROR
         finally:
-            db.session.rollback()
+            models.db.session.rollback()
 
 class DeleteMixin:
     @jwt_required()
@@ -85,8 +85,8 @@ class DeleteMixin:
             return Response.RESOURCE_NOT_FOUND
 
         try:
-            db.session.delete(resource)
-            db.session.commit()
+            models.db.session.delete(resource)
+            models.db.session.commit()
             return Response.RESOURCE_DELETED
         except IntegrityError:
             return Response.FOREIGN_KEY_DEPENDENT
@@ -94,4 +94,4 @@ class DeleteMixin:
             print(f"Error deleting resource: {e}")
             return Response.INTERNAL_SERVER_ERROR
         finally:
-            db.session.rollback()
+            models.db.session.rollback()

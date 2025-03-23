@@ -3,7 +3,8 @@ from utils.imports import *
 app = Flask(__name__)
 
 # Database
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../data/data.db'
+db_path = os.path.join(os.getcwd(), 'data/data.db')
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 with app.app_context():
