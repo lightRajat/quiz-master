@@ -55,7 +55,7 @@ onMounted(async () => {
                             <td>{{ row.name }}</td>
                             <td>{{ row.description }}</td>
                             <td>
-                                <RouterLink to="#" class="btn btn-outline-secondary d-flex">
+                                <RouterLink to="#" class="btn btn-outline-secondary d-flex" style="width: fit-content;">
                                     <i class="bi bi-info"></i> View
                                 </RouterLink>
                             </td>
@@ -66,7 +66,7 @@ onMounted(async () => {
                         <tr>
                             <td colspan="4">
                                 <RouterLink to="/admin/subjects" class="btn btn-primary d-flex mx-auto" style="width: fit-content;">
-                                    <i class="bi bi-book-half me-2"></i> Show All Subjects
+                                    <i class="bi bi-journal me-2"></i> Show All Subjects
                                 </RouterLink>
                             </td>
                         </tr>

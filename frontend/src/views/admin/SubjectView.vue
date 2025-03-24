@@ -1,3 +1,53 @@
+<script setup>
+import Card from '@/components/Card.vue';
+import { ref, onMounted } from 'vue';
+import { api } from '@/utils/auth';
+import { RouterLink } from 'vue-router';
+
+const subjects = ref([]);
+
+onMounted(async () => {
+    try {
+        const response = await api.get('/subjects');
+        subjects.value = response.data.data;
+    } catch (error) {
+        console.log(error);
+    }
+});
+</script>
+
 <template>
-    subject view
+    <div class="m-5">
+        <Card heading="All Subjects">
+            <table class="table table-striped table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="table-group-divider">
+                    <tr v-for="(row, rowIndex) in subjects" :key="rowIndex">
+                        <th scope="row">{{ rowIndex + 1 }}</th>
+                        <td>{{ row.name }}</td>
+                        <td>{{ row.description || "--No Description Set--" }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <RouterLink :to="`/subject/${row.id}`" class="btn btn-success">
+                                    <i class="bi bi-file-earmark me-1"></i>
+                                    View Chapters
+                                </RouterLink>
+                                <RouterLink to="#" class="btn btn-outline-secondary">Edit</RouterLink>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr v-if="subjects.length === 0">
+                        <td colspan="4" class="text-center lead">No Data Available</td>
+                    </tr>
+                </tbody>
+            </table>
+        </Card>
+    </div>
 </template>
