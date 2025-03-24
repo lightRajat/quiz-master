@@ -1,26 +1,15 @@
 <script setup>
 import Card from '@/components/Card.vue';
-import { RouterLink, useRoute } from 'vue-router';
 import { ref, onMounted } from 'vue';
 import { api } from '@/utils/auth';
+import { RouterLink } from 'vue-router';
 
-const route = useRoute();
-const chapters = ref([]);
-const subjectName = ref('');
+const subjects = ref([]);
 
 onMounted(async () => {
-    const pathSplit = route.path.split('/');
-    const subjectId = pathSplit[pathSplit.length - 1];
     try {
-        // fecth chapters
-        let response = await api.get(`/chapters?subject_id=${subjectId}`);
-        console.log(response.data.data);
-        chapters.value = response.data.data;
-
-        // fecth subject name
-        response = await api.get(`/subject/${subjectId}`);
-        subjectName.value = response.data.data.name;
-        document.title = subjectName.value;
+        const response = await api.get('/subjects');
+        subjects.value = response.data.data;
     } catch (error) {
         console.log(error);
     }
@@ -29,7 +18,7 @@ onMounted(async () => {
 
 <template>
     <div class="m-5">
-        <Card heading="Chapters" :subheading="subjectName">
+        <Card heading="All Subjects">
             <table class="table table-striped table-hover align-middle">
                 <thead>
                     <tr>
@@ -40,13 +29,13 @@ onMounted(async () => {
                     </tr>
                 </thead>
                 <tbody class="table-group-divider">
-                    <tr v-for="(row, rowIndex) in chapters" :key="rowIndex">
+                    <tr v-for="(row, rowIndex) in subjects" :key="rowIndex">
                         <th scope="row">{{ rowIndex + 1 }}</th>
                         <td>{{ row.name }}</td>
                         <td>{{ row.description || "--- No Description Set ---" }}</td>
                         <td>
                             <div class="btn-group" role="group">
-                                <RouterLink :to="`/admin/subject/${row.id}`" class="btn btn-success">
+                                <RouterLink :to="`/admin/subject/${row.id}`" class="btn btn-success d-flex">
                                     <i class="bi bi-file-earmark me-1"></i>
                                     View Chapters
                                 </RouterLink>
@@ -54,7 +43,7 @@ onMounted(async () => {
                             </div>
                         </td>
                     </tr>
-                    <tr v-if="chapters.length === 0">
+                    <tr v-if="subjects.length === 0">
                         <td colspan="4" class="text-center lead">No Data Available</td>
                     </tr>
                 </tbody>

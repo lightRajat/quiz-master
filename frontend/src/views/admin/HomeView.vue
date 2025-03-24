@@ -53,7 +53,7 @@ onMounted(async () => {
                         <tr v-for="(row, rowIndex) in state.subjects.slice(0, state.subjects.length < limit ? state.subjects.length : limit)" :key="rowIndex">
                             <th scope="row">{{ rowIndex + 1 }}</th>
                             <td>{{ row.name }}</td>
-                            <td>{{ row.description }}</td>
+                            <td>{{ row.description || "--- No Description ---" }}</td>
                             <td>
                                 <RouterLink to="#" class="btn btn-outline-secondary d-flex" style="width: fit-content;">
                                     <i class="bi bi-info"></i> View

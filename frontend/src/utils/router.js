@@ -10,6 +10,7 @@ import UnauthorizedView from '@/views/public/UnauthorizedView.vue';
 import AdminDashboard from '@/components/admin/AdminDashboard.vue';
 import UserDashboard from '@/views/user/Dashboard.vue';
 import AdminHomeView from '@/views/admin/HomeView.vue';
+import AdminSubjectsView from '@/views/admin/SubjectsView.vue';
 import AdminSubjectView from '@/views/admin/SubjectView.vue';
 import AdminQuizView from '@/views/admin/QuizView.vue';
 
@@ -27,8 +28,9 @@ const router = createRouter({
             path: '/admin', name: 'admin-dashboard', component: AdminDashboard, meta: {requiresAuth: true},
             children: [
                 {path: '/admin', name: 'admin-home', component: AdminHomeView, meta: {title: "Dashboard"}},
-                {path: '/admin/subjects', name: 'admin-subject', component: AdminSubjectView, meta: {title: "Subjects"}},
+                {path: '/admin/subjects', name: 'admin-subjects', component: AdminSubjectsView, meta: {title: "Subjects"}},
                 {path: '/admin/quizzes', name: 'admin-quiz', component: AdminQuizView, meta: {title: "Quizzes"}},
+                {path: '/admin/subject/:subject_id', name: 'admin-subject', component: AdminSubjectView},
             ]
         },
         {
