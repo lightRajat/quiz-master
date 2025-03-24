@@ -5,20 +5,22 @@ import { ref, onMounted } from 'vue';
 import { api } from '@/utils/auth';
 
 const route = useRoute();
+
 const chapters = ref([]);
 const subjectName = ref('');
+const subjectId = ref('0');
 
 onMounted(async () => {
     const pathSplit = route.path.split('/');
-    const subjectId = pathSplit[pathSplit.length - 1];
+    subjectId.value = pathSplit[pathSplit.length - 1];
     try {
         // fecth chapters
-        let response = await api.get(`/chapters?subject_id=${subjectId}`);
+        let response = await api.get(`/chapters?subject_id=${subjectId.value}`);
         console.log(response.data.data);
         chapters.value = response.data.data;
 
         // fecth subject name
-        response = await api.get(`/subject/${subjectId}`);
+        response = await api.get(`/subject/${subjectId.value}`);
         subjectName.value = response.data.data.name;
         document.title = subjectName.value;
     } catch (error) {
@@ -29,7 +31,7 @@ onMounted(async () => {
 
 <template>
     <div class="m-5">
-        <Card heading="Chapters" :subheading="subjectName">
+        <Card :heading="chapters.length ? 'Chapters' : 'No Chapters Available'" :subheading="subjectName">
             <table class="table table-striped table-hover align-middle">
                 <thead>
                     <tr>
@@ -44,13 +46,20 @@ onMounted(async () => {
                         <th scope="row">{{ rowIndex + 1 }}</th>
                         <td>{{ row.name }}</td>
                         <td>{{ row.description || "--- No Description Set ---" }}</td>
-                        <td>
+                        <td class="d-flex" style="width: fit-content;">
+                            <RouterLink :to="`/admin/subject/${subjectId}/${row.id}`" class="btn btn-primary me-3">
+                                <i class="bi bi-question-square me-1"></i>
+                                View Questions
+                            </RouterLink>
                             <div class="btn-group" role="group">
-                                <RouterLink :to="`/admin/subject/${row.id}`" class="btn btn-success">
-                                    <i class="bi bi-file-earmark me-1"></i>
-                                    View Chapters
-                                </RouterLink>
-                                <RouterLink to="#" class="btn btn-outline-secondary">Edit</RouterLink>
+                                <button class="btn btn-outline-secondary">
+                                    <i class="bi bi-pencil me-1"></i>
+                                    Edit
+                                </button>
+                                <button class="btn btn-outline-danger">
+                                    <i class="bi bi-trash me-1"></i>
+                                    Delete
+                                </button>
                             </div>
                         </td>
                     </tr>

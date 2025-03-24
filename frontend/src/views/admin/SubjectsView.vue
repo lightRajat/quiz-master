@@ -33,13 +33,20 @@ onMounted(async () => {
                         <th scope="row">{{ rowIndex + 1 }}</th>
                         <td>{{ row.name }}</td>
                         <td>{{ row.description || "--- No Description Set ---" }}</td>
-                        <td>
+                        <td class="d-flex">
+                            <RouterLink :to="`/admin/subject/${row.id}`" class="btn btn-primary d-flex me-3" style="width: fit-content;">
+                                <i class="bi bi-file-earmark me-1"></i>
+                                View Chapters
+                            </RouterLink>
                             <div class="btn-group" role="group">
-                                <RouterLink :to="`/admin/subject/${row.id}`" class="btn btn-success d-flex">
-                                    <i class="bi bi-file-earmark me-1"></i>
-                                    View Chapters
-                                </RouterLink>
-                                <RouterLink to="#" class="btn btn-outline-secondary">Edit</RouterLink>
+                                <button class="btn btn-outline-secondary">
+                                    <i class="bi bi-pencil me-1"></i>
+                                    Edit
+                                </button>
+                                <button class="btn btn-outline-danger">
+                                    <i class="bi bi-trash me-1"></i>
+                                    Delete
+                                </button>
                             </div>
                         </td>
                     </tr>
