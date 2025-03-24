@@ -55,7 +55,7 @@ onMounted(async () => {
                             <td>{{ row.name }}</td>
                             <td>{{ row.description || "--- No Description ---" }}</td>
                             <td>
-                                <RouterLink to="#" class="btn btn-outline-secondary d-flex" style="width: fit-content;">
+                                <RouterLink :to="`/admin/subject/${row.id}`" class="btn btn-outline-secondary d-flex" style="width: fit-content;">
                                     <i class="bi bi-info"></i> View
                                 </RouterLink>
                             </td>

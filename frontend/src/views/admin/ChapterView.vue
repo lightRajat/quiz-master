@@ -1,14 +1,17 @@
 <script setup>
 import Card from '@/components/Card.vue';
-import { onMounted, ref } from 'vue';
+import { onMounted, reactive } from 'vue';
 import { api } from '@/utils/auth';
 import { useRoute } from 'vue-router';
+import DisabledInput from '@/components/DisabledInput.vue';
+import EditButton from '@/components/EditButton.vue';
 
 const route = useRoute();
 
-const questions = ref([]);
-const chapterId = ref('0');
-const chapterName = ref('');
+const state = reactive({
+    questions: [],
+    chapter: {name: '', id: ''},
+});
 
 const btnData = {
     text: "Add Question",
@@ -17,18 +20,24 @@ const btnData = {
     }
 }
 
+const editData = (id) => {
+    const question = state.questions.find((item) => item.id == id);
+    question.editable = !question.editable;
+};
+
 onMounted(async () => {
     const pathSplit = route.path.split('/');
-    chapterId.value = pathSplit[pathSplit.length - 1];
+    state.chapter.id = pathSplit[pathSplit.length - 1];
     try {
         // fetch questions
-        let response = await api.get(`/questions?chapter_id=${chapterId.value}`);
-        questions.value = response.data.data;
+        let response = await api.get(`/questions?chapter_id=${state.chapter.id}`);
+        state.questions = response.data.data;
+        state.questions.forEach((item) => item.editable = false);
 
         // fetch chapter name
-        response = await api.get(`/chapter/${chapterId.value}`);
-        chapterName.value = response.data.data.name;
-        document.title = chapterName.value;
+        response = await api.get(`/chapter/${state.chapter.id}`);
+        state.chapter.name = response.data.data.name;
+        document.title = state.chapter.name;
     } catch (error) {
         console.log(error);
     }
@@ -37,20 +46,19 @@ onMounted(async () => {
 
 <template>
     <div class="m-3">
-        <Card :heading="questions.length ? 'Questions' : 'No Questions Available'"
-        :subheading="chapterName" :btn="btnData">
-            <div v-for="(question, index) in questions" :key="index" class="card m-5">
+        <Card :heading="state.questions.length ? 'Questions' : 'No Questions Available'"
+        :subheading="state.chapter.name" :btn="btnData">
+            <div v-for="(question, index) in state.questions" :key="index" class="card m-5">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                         <p class="h5">
                             <span class="me-3">{{ index + 1 }}.</span>
-                            {{ question.question }}
+                            <DisabledInput :text="question.question"
+                            :editable="question.editable" />
                         </p>
                         <div class="btn-group" role="group">
-                            <button class="btn btn-outline-secondary d-flex">
-                                <i class="bi bi-pencil me-2"></i>
-                                Edit
-                            </button>
+                            <EditButton :editable="question.editable"
+                            :func="() => editData(question.id)" />
                             <button class="btn btn-outline-danger">
                                 <i class="bi bi-trash me-2"></i>
                                 Delete
@@ -61,31 +69,49 @@ onMounted(async () => {
                         <div>
                             <li>
                                 <div>A. </div>
-                                <div>{{ question.option_a }}</div>
+                                <div>
+                                    <DisabledInput :text="question.option_a"
+                                    :editable="question.editable" />
+                                </div>
                             </li>
                             <li>
                                 <div>B. </div>
-                                <div>{{ question.option_b }}</div>
+                                <div>
+                                    <DisabledInput :text="question.option_b"
+                                    :editable="question.editable" />
+                                </div>
                             </li>
                         </div>
                         <div v-if="question.option_c">
                             <li>
                                 <div>C. </div>
-                                <div>{{ question.option_c }}</div>
+                                <div>
+                                    <DisabledInput :text="question.option_c"
+                                    :editable="question.editable" />
+                                </div>
                             </li>
                             <li>
                                 <div>D. </div>
-                                <div>{{ question.option_d }}</div>
+                                <div>
+                                    <DisabledInput :text="question.option_d"
+                                    :editable="question.editable" />
+                                </div>
                             </li>
                         </div>
                     </ul>
                     <p>
                         Correct Option:
-                        <span class="text-success">{{ question.correct_option.toUpperCase() }}</span>
+                        <span class="text-success">
+                            <DisabledInput :text="question.correct_option.toUpperCase()"
+                            :editable="question.editable" />
+                        </span>
                     </p>
                     <p>
                         Score:
-                        <span class="text-secondary">{{ question.score }}</span>
+                        <span class="text-secondary">
+                            <DisabledInput :text="question.score"
+                            :editable="question.editable" />
+                        </span>
                     </p>
                 </div>
             </div>

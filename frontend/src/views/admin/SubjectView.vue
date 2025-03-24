@@ -1,14 +1,17 @@
 <script setup>
 import Card from '@/components/Card.vue';
 import { RouterLink, useRoute } from 'vue-router';
-import { ref, onMounted } from 'vue';
+import { onMounted, reactive } from 'vue';
 import { api } from '@/utils/auth';
+import DisabledInput from '@/components/DisabledInput.vue';
+import EditButton from '@/components/EditButton.vue';
 
 const route = useRoute();
 
-const chapters = ref([]);
-const subjectName = ref('');
-const subjectId = ref('0');
+const state = reactive({
+    chapters: [],
+    subject: {name: '', id: ''},
+});
 
 const btnData = {
     text: "Add Chapter",
@@ -17,19 +20,30 @@ const btnData = {
     }
 }
 
+const addEditables = (obj) => {
+    obj.forEach((item) => {
+        item.editable = false;
+    });
+};
+
+const editData = (id) => {
+    const chapter = state.chapters.find((item) => item.id === id);
+    chapter.editable = !chapter.editable;
+};
+
 onMounted(async () => {
     const pathSplit = route.path.split('/');
-    subjectId.value = pathSplit[pathSplit.length - 1];
+    state.subject.id = pathSplit[pathSplit.length - 1];
     try {
         // fecth chapters
-        let response = await api.get(`/chapters?subject_id=${subjectId.value}`);
-        console.log(response.data.data);
-        chapters.value = response.data.data;
+        let response = await api.get(`/chapters?subject_id=${state.subject.id}`);
+        state.chapters = response.data.data;
+        addEditables(state.chapters);
 
         // fecth subject name
-        response = await api.get(`/subject/${subjectId.value}`);
-        subjectName.value = response.data.data.name;
-        document.title = subjectName.value;
+        response = await api.get(`/subject/${state.subject.id}`);
+        state.subject.name = response.data.data.name;
+        document.title = state.subject.name;
     } catch (error) {
         console.log(error);
     }
@@ -38,8 +52,8 @@ onMounted(async () => {
 
 <template>
     <div class="m-5">
-        <Card :heading="chapters.length ? 'Chapters' : 'No Chapters Available'"
-        :subheading="subjectName"
+        <Card :heading="state.chapters.length ? 'Chapters' : 'No Chapters Available'"
+        :subheading="state.subject.name"
         :btn="btnData">
             <table class="table table-striped table-hover align-middle">
                 <thead>
@@ -51,20 +65,23 @@ onMounted(async () => {
                     </tr>
                 </thead>
                 <tbody class="table-group-divider">
-                    <tr v-for="(row, rowIndex) in chapters" :key="rowIndex">
+                    <tr v-for="(row, rowIndex) in state.chapters" :key="rowIndex">
                         <th scope="row">{{ rowIndex + 1 }}</th>
-                        <td>{{ row.name }}</td>
-                        <td>{{ row.description || "--- No Description Set ---" }}</td>
+                        <td>
+                            <DisabledInput :text="row.name" :editable="row.editable" />
+                        </td>
+                        <td>
+                            <DisabledInput :text="row.description" :editable="row.editable" />
+                        </td>
                         <td class="d-flex">
-                            <RouterLink :to="`/admin/subject/${subjectId}/${row.id}`" class="btn btn-primary d-flex me-3">
+                            <RouterLink :to="`/admin/subject/${state.subject.id}/${row.id}`"
+                            class="btn btn-primary d-flex me-3">
                                 <i class="bi bi-question-square me-1"></i>
                                 View Questions
                             </RouterLink>
                             <div class="btn-group" role="group">
-                                <button class="btn btn-outline-secondary">
-                                    <i class="bi bi-pencil me-1"></i>
-                                    Edit
-                                </button>
+                                <EditButton :editable="row.editable"
+                                :func="() => editData(row.id)" />
                                 <button class="btn btn-outline-danger">
                                     <i class="bi bi-trash me-1"></i>
                                     Delete
@@ -72,7 +89,7 @@ onMounted(async () => {
                             </div>
                         </td>
                     </tr>
-                    <tr v-if="chapters.length === 0">
+                    <tr v-if="!state.chapters.length">
                         <td colspan="4" class="text-center lead">No Data Available</td>
                     </tr>
                 </tbody>
