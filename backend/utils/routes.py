@@ -12,21 +12,19 @@ class SubjectApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
             if not result:
                 return Response.RESOURCE_NOT_FOUND
             subject = {
-                'id': result.id,
                 'name': result.name,
                 'description': result.description
             }
             return Response.RESOURCE_FETCHED(subject)
         else:
             results = models.Subject.query.all()
-            subjects = []
+            subjects = {}
             for result in results:
                 subject = {
-                    'id': result.id,
                     'name': result.name,
                     'description': result.description
                 }
-                subjects.append(subject)
+                subjects[result.id] = subject
             return Response.RESOURCE_FETCHED(subjects)
 
     def post(self):
@@ -45,7 +43,6 @@ class ChapterApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
             if not result:
                 return Response.RESOURCE_NOT_FOUND
             chapter = {
-                'id': result.id,
                 'subject_id': result.subject_id,
                 'name': result.name,
                 'description': result.description
@@ -57,15 +54,14 @@ class ChapterApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
                 results = models.Chapter.query.filter_by(subject_id=subject_id).all()
             else:
                 results = models.Chapter.query.all()
-            chapters = []
+            chapters = {}
             for result in results:
                 chapter = {
-                    'id': result.id,
                     'subject_id': result.subject_id,
                     'name': result.name,
                     'description': result.description
                 }
-                chapters.append(chapter)
+                chapters[result.id] = chapter
             return Response.RESOURCE_FETCHED(chapters)
 
     def post(self):
@@ -84,7 +80,6 @@ class QuestionApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
             if not result:
                 return Response.RESOURCE_NOT_FOUND
             question = {
-                'id': result.id,
                 'chapter_id': result.chapter_id,
                 'question': result.question,
                 'option_a': result.option_a,
@@ -101,10 +96,9 @@ class QuestionApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
                 results = models.Question.query.filter_by(chapter_id=chapter_id).all()
             else:
                 results = models.Question.query.all()
-            questions = []
+            questions = {}
             for result in results:
                 question = {
-                    'id': result.id,
                     'chapter_id': result.chapter_id,
                     'question': result.question,
                     'option_a': result.option_a,
@@ -114,7 +108,7 @@ class QuestionApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
                     'correct_option': result.correct_option,
                     'score': result.score
                 }
-                questions.append(question)
+                questions[result.id] = question
             return Response.RESOURCE_FETCHED(questions)
 
     def post(self):
@@ -133,7 +127,6 @@ class QuizApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
             if not result:
                 return Response.RESOURCE_NOT_FOUND
             quiz = {
-                'id': result.id,
                 'scope': result.scope,
                 'chapter_id': result.chapter_id,
                 'subject_id': result.subject_id,
@@ -152,17 +145,16 @@ class QuizApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
                 results = models.Quiz.query.filter_by(subject_id=subject_id).all()
             else:
                 results = models.Quiz.query.all()
-            quizzes = []
+            quizzes = {}
             for result in results:
                 quiz = {
-                    'id': result.id,
                     'scope': result.scope,
                     'chapter_id': result.chapter_id,
                     'subject_id': result.subject_id,
                     'time': result.time,
                     'description': result.description
                 }
-                quizzes.append(quiz)
+                quizzes[result.id] = quiz
             return Response.RESOURCE_FETCHED(quizzes)
 
     def post(self):
@@ -206,18 +198,46 @@ class QuizQuestionApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
 
 class UserApi(Resource):
     @jwt_required()
-    def get(self, user_id: int):
+    def get(self, user_id: int = None):
         token_user_id = get_jwt_identity()
         
+        # if admin
         if token_user_id == 'admin':
-            result = models.User.query.get(user_id)
-            if not result:
-                return Response.USER_NOT_FOUND
+            # if requested for one user
+            if user_id:
+                result = models.User.query.get(user_id)
+            else:
+                results = models.User.query.all()
+                users = {}
+                for result in results:
+                    user = {
+                        'id': result.id,
+                        'name': result.name,
+                        'email': result.email,
+                        'username': result.username,
+                        'date_joined': get(result.date_joined),
+                        'qualification': result.qualification,
+                        'dob': get(result.dob),
+                        'date_account_deleted': get(result.date_account_deleted),
+                        'profile_pic': ''
+                    }
+                    if result.profile_pic:
+                        user['profile_pic'] = f"uploads/{result.profile_pic}"
+                    users[result.id] = user
+                return Response.RESOURCE_FETCHED(users)
         else:
-            result = models.User.query.get(token_user_id)
-            if result.id != user_id:
+            # if requested for one user
+            if user_id:
+                # check if not requested for himself
+                if user_id != token_user_id:
+                    return Response.UNAUTHORIZED
+                else:
+                    result = models.User.query.get(user_id)
+            else:
                 return Response.UNAUTHORIZED
 
+        if not result:
+            return Response.USER_NOT_FOUND
         user = {
             'id': result.id,
             'name': result.name,
@@ -236,27 +256,60 @@ class UserApi(Resource):
         
 class QuizAttemptApi(Resource):
     @jwt_required()
-    def get(self, user_id):
+    def get(self, qa_id: int = None):
         token_user_id = get_jwt_identity()
-
-        if token_user_id == 'admin':
-            user = models.User.query.get(user_id)
-            if not user:
-                return Response.USER_NOT_FOUND
-        else:
-            if token_user_id != user_id:
-                return Response.UNAUTHORIZED
         
-        results = models.QuizAttempt.query.filter_by(user_id=user_id).all()
+        # if admin
+        if token_user_id == 'admin':
+            # if requested for quiz attempt with id
+            if qa_id:
+                # check if exists
+                result = models.QuizAttempt.query.get(qa_id)
+                if result:
+                    quiz_attempt = {
+                        'id': result.id,
+                        'quiz_id': result.quiz_id,
+                        'user_id': result.user_id,
+                        'date_attempted': get(result.date_attempted),
+                        'time_taken': result.time_taken,
+                        'score': result.score
+                    }
+                    return Response.RESOURCE_FETCHED(quiz_attempt)
+                else:
+                    return Response.RESOURCE_NOT_FOUND
+            else:
+                # if requested for one user
+                user_id = int(request.args.get('user_id'))
+                if user_id:
+                    results = models.QuizAttempt.query.filter_by(user_id=user_id).all()
+                else:
+                    results = models.QuizAttempt.query.all()
+        else:
+            # if requested for quiz attempt with id
+            if qa_id:
+                return Response.UNAUTHORIZED
+            else:
+                # if requested for one user
+                user_id = int(request.args.get('user_id'))
+                if user_id:
+                    # if not requested for himself
+                    if token_user_id != user_id:
+                        return Response.UNAUTHORIZED
+                    else:
+                        results = models.QuizAttempt.query.filter_by(user_id=user_id).all()
+                else:
+                    return Response.UNAUTHORIZED
 
-        quiz_attempts = []
+        quiz_attempts = {}
         for result in results:
-            quiz_attempts.append({
+            quiz_attempt = {
                 'id': result.id,
+                'user_id': result.user_id,
                 'quiz_id': result.quiz_id,
                 'date_attempted': get(result.date_attempted),
                 'time_taken': result.time_taken,
                 'score': result.score
-            })
+            }
+            quiz_attempts[result.id] = quiz_attempt
 
         return Response.RESOURCE_FETCHED(quiz_attempts)

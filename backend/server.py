@@ -27,8 +27,8 @@ api.add_resource(routes.ChapterApi, '/chapters', '/chapter/<int:id>')
 api.add_resource(routes.QuestionApi, '/questions', '/question/<int:id>')
 api.add_resource(routes.QuizApi, '/quizzes', '/quiz/<int:id>')
 api.add_resource(routes.QuizQuestionApi, '/quiz-questions', '/quiz-question/<int:id>')
-api.add_resource(routes.UserApi, '/user/<int:user_id>')
-api.add_resource(routes.QuizAttemptApi, '/user/<int:user_id>/quiz-attempts')
+api.add_resource(routes.UserApi, '/users', '/user/<int:user_id>')
+api.add_resource(routes.QuizAttemptApi, '/quiz-attempts', '/quiz-attempts/<int:qa_id>')
 
 @app.route('/login', methods=['POST'])
 def login():
