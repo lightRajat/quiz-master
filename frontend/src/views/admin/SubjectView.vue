@@ -10,6 +10,13 @@ const chapters = ref([]);
 const subjectName = ref('');
 const subjectId = ref('0');
 
+const btnData = {
+    text: "Add Chapter",
+    func: () => {
+        alert("chapter added");
+    }
+}
+
 onMounted(async () => {
     const pathSplit = route.path.split('/');
     subjectId.value = pathSplit[pathSplit.length - 1];
@@ -31,7 +38,9 @@ onMounted(async () => {
 
 <template>
     <div class="m-5">
-        <Card :heading="chapters.length ? 'Chapters' : 'No Chapters Available'" :subheading="subjectName">
+        <Card :heading="chapters.length ? 'Chapters' : 'No Chapters Available'"
+        :subheading="subjectName"
+        :btn="btnData">
             <table class="table table-striped table-hover align-middle">
                 <thead>
                     <tr>
@@ -46,8 +55,8 @@ onMounted(async () => {
                         <th scope="row">{{ rowIndex + 1 }}</th>
                         <td>{{ row.name }}</td>
                         <td>{{ row.description || "--- No Description Set ---" }}</td>
-                        <td class="d-flex" style="width: fit-content;">
-                            <RouterLink :to="`/admin/subject/${subjectId}/${row.id}`" class="btn btn-primary me-3">
+                        <td class="d-flex">
+                            <RouterLink :to="`/admin/subject/${subjectId}/${row.id}`" class="btn btn-primary d-flex me-3">
                                 <i class="bi bi-question-square me-1"></i>
                                 View Questions
                             </RouterLink>

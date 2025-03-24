@@ -6,6 +6,13 @@ import { RouterLink } from 'vue-router';
 
 const subjects = ref([]);
 
+const btnData = {
+    text: "Add Subject",
+    func: () => {
+        alert("hi");
+    }
+}
+
 onMounted(async () => {
     try {
         const response = await api.get('/subjects');
@@ -18,7 +25,7 @@ onMounted(async () => {
 
 <template>
     <div class="m-5">
-        <Card heading="All Subjects">
+        <Card heading="All Subjects" :btn="btnData">
             <table class="table table-striped table-hover align-middle">
                 <thead>
                     <tr>

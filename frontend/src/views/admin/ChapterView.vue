@@ -10,6 +10,13 @@ const questions = ref([]);
 const chapterId = ref('0');
 const chapterName = ref('');
 
+const btnData = {
+    text: "Add Question",
+    func: () => {
+        alert("hi");
+    }
+}
+
 onMounted(async () => {
     const pathSplit = route.path.split('/');
     chapterId.value = pathSplit[pathSplit.length - 1];
@@ -30,7 +37,8 @@ onMounted(async () => {
 
 <template>
     <div class="m-3">
-        <Card :heading="questions.length ? 'Questions' : 'No Questions Available'" :subheading="chapterName">
+        <Card :heading="questions.length ? 'Questions' : 'No Questions Available'"
+        :subheading="chapterName" :btn="btnData">
             <div v-for="(question, index) in questions" :key="index" class="card m-5">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
