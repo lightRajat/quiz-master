@@ -58,8 +58,6 @@ api.interceptors.response.use((response) => {
   if (error.response) {
     const statusCode = error.response.status;
     if (statusCode === 401 || statusCode === 403) {
-      sessionStorage.removeItem('token');
-      sessionStorage.removeItem('user');
       window.location.href = '/unauthorized';
     }
   }

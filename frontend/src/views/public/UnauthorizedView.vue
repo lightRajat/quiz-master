@@ -6,6 +6,8 @@ const router = useRouter();
 const timeLeft = ref(3);
 
 onMounted(() => {
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
     const intervalRef = setInterval(() => {
         timeLeft.value--;
         if (timeLeft.value == 0) {

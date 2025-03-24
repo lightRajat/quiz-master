@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import { getCurrentUser } from './auth';
 
 import Landing from '@/components/public/Landing.vue';
 import LoginView from '@/views/public/LoginView.vue';
@@ -23,7 +24,7 @@ const router = createRouter({
             ]
         },
         {
-            path: '/admin', name: 'admin-dashboard', component: AdminDashboard,
+            path: '/admin', name: 'admin-dashboard', component: AdminDashboard, meta: {requiresAuth: true},
             children: [
                 {path: '/admin', name: 'admin-home', component: AdminHomeView, meta: {title: "Dashboard"}},
                 {path: '/admin/subjects', name: 'admin-subject', component: AdminSubjectView, meta: {title: "Subjects"}},
@@ -31,7 +32,7 @@ const router = createRouter({
             ]
         },
         {
-            path: '/user/:username', name: 'user-dashboard', component: UserDashboard
+            path: '/user/:username', name: 'user-dashboard', component: UserDashboard, meta: {requiresAuth: true},
         },
         {path: '/:catchAll(.*)', name: 'not-found', component: NotFoundView, meta: {title: "404 Not Found"}},
         {path: '/unauthorized', name: 'unauthorized', component: UnauthorizedView, meta: {title: "Not Authorized"}}
@@ -40,6 +41,23 @@ const router = createRouter({
 
 router.afterEach((to) => {
     document.title = to.meta.title || "Quiz Master";
+});
+
+router.beforeEach((to, from, next) => {
+    if (to.meta.requiresAuth) {
+        const pageOf = (() => {
+            const pathSplit = to.path.split('/')
+            if (pathSplit[1] === 'admin') {
+                return 'admin';
+            }
+            return pathSplit[2];
+        })();
+        const currUser = getCurrentUser();
+        if (pageOf !== currUser) {
+            next('/unauthorized');
+        }
+    }
+    next();
 });
 
 export default router;
