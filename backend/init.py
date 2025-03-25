@@ -135,12 +135,10 @@ def add_sample_data():
             for row in reader:
                 quiz_id = int(row[0])
                 question_id = int(row[1])
-                order = float(row[2])
 
                 quiz_question = QuizQuestion(
                     quiz_id = quiz_id,
                     question_id = question_id,
-                    order = order
                 )
 
                 db.session.add(quiz_question)

@@ -66,10 +66,8 @@ class QuizQuestion(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     quiz_id = db.Column(db.Integer, ForeignKey('quiz.id'), nullable=False)
     question_id = db.Column(db.Integer, ForeignKey('question.id'), nullable=False)
-    order = db.Column(db.Float, nullable=False)
 
     __table_args__ = (UniqueConstraint('quiz_id', 'question_id', name="unique_quiz_question"), )
-    __table_args__ = (UniqueConstraint('quiz_id', 'order', name="unique_quiz_question_order"), )
 
 class QuizAttempt(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)

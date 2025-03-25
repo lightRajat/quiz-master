@@ -189,7 +189,6 @@ class QuizQuestionApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
                 'id': result.id,
                 'quiz_id': result.quiz_id,
                 'question_id': result.question_id,
-                'order': result.order
             }
             quiz_questions.append(quiz_question)
 
