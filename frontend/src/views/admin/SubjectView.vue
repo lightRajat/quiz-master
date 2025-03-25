@@ -26,9 +26,22 @@ const addEditables = (obj) => {
     });
 };
 
-const editData = (id) => {
+const editData = async (id) => {
     const chapter = state.chapters.find((item) => item.id === id);
     chapter.editable = !chapter.editable;
+
+    // update data on server
+    if (!chapter.editable) {
+        try {
+            const { editable: value, ...dataToSend } = chapter;
+            console.log(dataToSend);
+            const response = await api.put(`/chapter/${id}`, dataToSend);
+            console.log(response.data);
+            window.showToast("Chapter Successfully Updated", 'success');
+        } catch (error) {
+            console.log(error.response?.data || error);
+        }
+    }
 };
 
 onMounted(async () => {
@@ -68,10 +81,12 @@ onMounted(async () => {
                     <tr v-for="(row, rowIndex) in state.chapters" :key="rowIndex">
                         <th scope="row">{{ rowIndex + 1 }}</th>
                         <td>
-                            <DisabledInput :text="row.name" :editable="row.editable" />
+                            <DisabledInput :text="row.name" :editable="row.editable"
+                            @input-change="(newValue) => row.name = newValue" />
                         </td>
                         <td>
-                            <DisabledInput :text="row.description" :editable="row.editable" />
+                            <DisabledInput :text="row.description" :editable="row.editable"
+                            @input-change="(newValue) => row.description = newValue" />
                         </td>
                         <td class="d-flex">
                             <RouterLink :to="`/admin/subject/${state.subject.id}/${row.id}`"
@@ -82,6 +97,7 @@ onMounted(async () => {
                             <div class="btn-group" role="group">
                                 <EditButton :editable="row.editable"
                                 :func="() => editData(row.id)" />
+
                                 <button class="btn btn-outline-danger">
                                     <i class="bi bi-trash me-1"></i>
                                     Delete

@@ -20,9 +20,24 @@ const btnData = {
     }
 }
 
-const editData = (id) => {
+const editData = async (id) => {
     const question = state.questions.find((item) => item.id == id);
     question.editable = !question.editable;
+
+    // update data on server
+    if (!question.editable) {
+        try {
+            const { editable: value, ...dataToSend } = question;
+            dataToSend.score = Number(dataToSend.score);
+            dataToSend.correct_option = dataToSend.correct_option.toLowerCase();
+            console.log(dataToSend);
+            const response = await api.put(`/question/${id}`, dataToSend);
+            console.log(response.data);
+            window.showToast("Question Successfully Updated", 'success');
+        } catch (error) {
+            console.log(error.response?.data || error);
+        }
+    }
 };
 
 onMounted(async () => {
@@ -54,11 +69,13 @@ onMounted(async () => {
                         <p class="h5">
                             <span class="me-3">{{ index + 1 }}.</span>
                             <DisabledInput :text="question.question"
-                            :editable="question.editable" />
+                            :editable="question.editable"
+                            @input-change="(newValue) => question.quesion = newValue" />
                         </p>
                         <div class="btn-group" role="group">
                             <EditButton :editable="question.editable"
                             :func="() => editData(question.id)" />
+
                             <button class="btn btn-outline-danger">
                                 <i class="bi bi-trash me-2"></i>
                                 Delete
@@ -71,14 +88,16 @@ onMounted(async () => {
                                 <div>A. </div>
                                 <div>
                                     <DisabledInput :text="question.option_a"
-                                    :editable="question.editable" />
+                                    :editable="question.editable"
+                                    @input-change="(newValue) => question.option_a = newValue" />
                                 </div>
                             </li>
                             <li>
                                 <div>B. </div>
                                 <div>
                                     <DisabledInput :text="question.option_b"
-                                    :editable="question.editable" />
+                                    :editable="question.editable"
+                                    @input-change="(newValue) => question.option_b = newValue" />
                                 </div>
                             </li>
                         </div>
@@ -87,14 +106,16 @@ onMounted(async () => {
                                 <div>C. </div>
                                 <div>
                                     <DisabledInput :text="question.option_c"
-                                    :editable="question.editable" />
+                                    :editable="question.editable"
+                                    @input-change="(newValue) => question.option_c = newValue" />
                                 </div>
                             </li>
                             <li>
                                 <div>D. </div>
                                 <div>
                                     <DisabledInput :text="question.option_d"
-                                    :editable="question.editable" />
+                                    :editable="question.editable"
+                                    @input-change="(newValue) => question.option_d = newValue" />
                                 </div>
                             </li>
                         </div>
@@ -103,14 +124,16 @@ onMounted(async () => {
                         Correct Option:
                         <span class="text-success">
                             <DisabledInput :text="question.correct_option.toUpperCase()"
-                            :editable="question.editable" />
+                            :editable="question.editable"
+                            @input-change="(newValue) => question.correct_option = newValue" />
                         </span>
                     </p>
                     <p>
                         Score:
                         <span class="text-secondary">
                             <DisabledInput :text="question.score"
-                            :editable="question.editable" />
+                            :editable="question.editable"
+                            @input-change="(newValue) => question.score = newValue" />
                         </span>
                     </p>
                 </div>

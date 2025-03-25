@@ -1,15 +1,20 @@
 <script setup>
-import { defineProps } from 'vue';
 
 defineProps({
     text: String,
     editable: Boolean,
 });
+
+const emit = defineEmits(['inputChange']);
+
+const updateProp = (event) => {
+    emit('inputChange', event.target.value);
+};
 </script>
 
 <template>
     <span v-if="!editable">{{ text || '--- No Data ---' }}</span>
-    <input v-else type="text" :value="text">
+    <input v-else type="text" :value="text" @input="updateProp">
 </template>
 
 <style scoped>

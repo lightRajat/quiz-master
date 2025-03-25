@@ -17,9 +17,22 @@ const btnData = {
     }
 }
 
-const editData = (id) => {
+const editData = async (id) => {
     const subject = state.subjects.find((item) => item.id == id);
     subject.editable = !subject.editable;
+
+    // update data on server
+    if (!subject.editable) {
+        try {
+            const { editable: value, ...dataToSend } = subject;
+            console.log(dataToSend);
+            const response = await api.put(`/subject/${id}`, dataToSend);
+            console.log(response.data);
+            window.showToast("Subject Successfully Updated", 'success');
+        } catch (error) {
+            console.log(error.response.data);
+        }
+    }
 };
 
 onMounted(async () => {
@@ -50,12 +63,12 @@ onMounted(async () => {
                     <tr v-for="(row, rowIndex) in state.subjects" :key="rowIndex">
                         <th scope="row">{{ rowIndex + 1 }}</th>
                         <td>
-                            <DisabledInput :text="row.name"
-                            :editable="row.editable" />
+                            <DisabledInput :text="row.name" :editable="row.editable"
+                            @input-change="(newValue) => row.name = newValue" />
                         </td>
                         <td>
-                            <DisabledInput :text="row.description"
-                            :editable="row.editable" />
+                            <DisabledInput :text="row.description" :editable="row.editable"
+                            @input-change="(newValue) => row.description = newValue" />
                         </td>
                         <td class="d-flex">
                             <RouterLink :to="`/admin/subject/${row.id}`"
