@@ -47,13 +47,15 @@ class PostMixin:
         if user != 'admin':
             return Response.UNAUTHORIZED
 
-        data = request.get_json()
+        data = request.form
         try:
             resource = model(**data)
             models.db.session.add(resource)
             models.db.session.commit()
 
-            return Response.RESOURCE_CREATED
+            createdResource = {**data, 'id': resource.id}
+
+            return Response.RESOURCE_CREATED(createdResource)
         except IntegrityError as e:
             error_msg = str(e.orig)
             if 'FOREIGN KEY constraint failed' in error_msg:

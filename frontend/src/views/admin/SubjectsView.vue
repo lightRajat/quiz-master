@@ -1,6 +1,6 @@
 <script setup>
 import Card from '@/components/Card.vue';
-import { reactive, onMounted } from 'vue';
+import { reactive, onMounted, ref } from 'vue';
 import { api } from '@/utils/auth';
 import { RouterLink } from 'vue-router';
 import DisabledInput from '@/components/DisabledInput.vue';
@@ -13,9 +13,7 @@ const state = reactive({
 
 const btnData = {
     text: "Add Subject",
-    func: () => {
-        alert("hi");
-    }
+    modalId: 'modal',
 }
 
 const editData = async (id) => {
@@ -40,6 +38,24 @@ const deleteData = (id) => {
     // delete data on frontend
     const itemIndex = state.subjects.findIndex((item) => item.id == id);
     state.subjects.splice(itemIndex, 1);
+};
+
+const formElem = ref(null);
+const modalCloseBtnElem = ref(null);
+const addData = async () => {
+    // send data to server
+    const formData = new FormData(formElem.value);
+    try {
+        const response = await api.post("/subjects", formData);
+        window.showToast("Subject Successfully Added", 'success');
+        modalCloseBtnElem.value.click();
+        formElem.value.reset();
+
+        // add data to frontend
+        state.subjects.unshift(response.data.data);
+    } catch (error) {
+        window.showToast("Can't Add Subject", 'danger', error.response.data.info);
+    }
 };
 
 onMounted(async () => {
@@ -99,5 +115,37 @@ onMounted(async () => {
                 </tbody>
             </table>
         </Card>
+        <div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Add Subject</h1>
+                        <button ref="modalCloseBtnElem" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form ref="formElem" id="add-subject" @submit.prevent="addData">
+                            <div class="mb-3">
+                                <label class="form-label" for="name">Name*</label>
+                                <input name="name" type="text" class="form-control"
+                                :placeholder="state.subjects[0]?.name" id="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="description">Description</label>
+                                <textarea name="description" type="text" class="form-control"
+                                :placeholder="state.subjects[0]?.description"
+                                id="description"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" form="add-subject" class="btn btn-success">
+                            <i class="bi bi-plus-lg me-1"></i>
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>

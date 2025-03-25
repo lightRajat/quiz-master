@@ -4,7 +4,6 @@ class Response:
     USER_NOT_FOUND = dumps({"status": "failed", "info": "User Not Found"}), 401
     INCORRECT_PASSWORD = dumps({"status": "failed", "info": "Incorrect Password"}), 401
     USER_ALREADY_EXISTS = dumps({"status": "failed", "info": "User Already Exists"}), 409
-    RESOURCE_CREATED = dumps({"status": "success", "info": "Resource Created Successfully"}), 201
     RESOURCE_ALREADY_EXISTS = dumps({"status": "failed", "info": "Resource Already Exists"}), 409
     UNAUTHORIZED = dumps({"status": "failed", "info": "Unauthorized"}), 403
     INVALID_FOREIGN_KEY = dumps({"status": "failed", "info": "Invalid Foreign Key"}), 400
@@ -43,3 +42,12 @@ class Response:
         }
         response['info'] = "Resource Successfully Fetched" if resource_list else "No Resource Were Found"
         return dumps(response), 200
+
+    @staticmethod
+    def RESOURCE_CREATED(resource):
+        response = {
+            'status': "success",
+            'data': resource,
+            'info': "Resource Created Successfully",
+        }
+        return dumps(response), 201

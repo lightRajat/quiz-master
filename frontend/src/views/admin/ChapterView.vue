@@ -1,6 +1,6 @@
 <script setup>
 import Card from '@/components/Card.vue';
-import { onMounted, reactive } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { api } from '@/utils/auth';
 import { useRoute } from 'vue-router';
 import DisabledInput from '@/components/DisabledInput.vue';
@@ -16,9 +16,7 @@ const state = reactive({
 
 const btnData = {
     text: "Add Question",
-    func: () => {
-        alert("hi");
-    }
+    modalId: 'modal',
 }
 
 const editData = async (id) => {
@@ -29,9 +27,8 @@ const editData = async (id) => {
     if (!question.editable) {
         try {
             const { editable: value, ...dataToSend } = question;
-            dataToSend.score = Number(dataToSend.score);
             dataToSend.correct_option = dataToSend.correct_option.toLowerCase();
-            console.log(dataToSend);
+            console.log(question);
             const response = await api.put(`/question/${id}`, dataToSend);
             console.log(response.data);
             window.showToast("Question Successfully Updated", 'success');
@@ -45,6 +42,25 @@ const deleteData = (id) => {
     // delete data on frontend
     const itemIndex = state.questions.findIndex((item) => item.id == id);
     state.questions.splice(itemIndex, 1);
+};
+
+const formElem = ref(null);
+const modalCloseBtnElem = ref(null);
+const addData = async () => {
+    // prepare data
+    const formData = new FormData(formElem.value);
+    formData.set('chapter_id', state.chapter.id);
+    try {
+        const response = await api.post("/questions", formData);
+        window.showToast("Question Successfully Added", 'success');
+        modalCloseBtnElem.value.click();
+        formElem.value.reset();
+
+        // add data to frontend
+        state.questions.unshift(response.data.data);
+    } catch (error) {
+        window.showToast("Can't Add Question", 'danger', error.response.data.info);
+    }
 };
 
 onMounted(async () => {
@@ -77,7 +93,7 @@ onMounted(async () => {
                             <span class="me-3">{{ index + 1 }}.</span>
                             <DisabledInput :text="question.question"
                             :editable="question.editable"
-                            @input-change="(newValue) => question.quesion = newValue" />
+                            @input-change="(newValue) => question.question = newValue" />
                         </p>
                         <div class="btn-group" role="group">
                             <EditButton :editable="question.editable"
@@ -144,6 +160,94 @@ onMounted(async () => {
                 </div>
             </div>
         </Card>
+        <div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">Add Question</h1>
+                        <button ref="modalCloseBtnElem" type="button" class="btn-close"
+                        data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form ref="formElem" id="add-question" @submit.prevent="addData">
+                            <!-- question -->
+                            <div class="mb-3">
+                                <label class="form-label" for="question">Question*</label>
+                                <input name="question" type="text" class="form-control"
+                                :placeholder="state.questions[0]?.question" id="question" required>
+                            </div>
+                            <!-- options -->
+                            <div class="mb-3">
+                                <label class="form-label" for="option_a">Option A*</label>
+                                <input name="option_a" type="text" class="form-control"
+                                :placeholder="state.questions[0]?.option_a"
+                                id="option_a" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="option_b">Option B*</label>
+                                <input name="option_b" type="text" class="form-control"
+                                :placeholder="state.questions[0]?.option_b"
+                                id="option_b" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="option_c">Option C</label>
+                                <input name="option_c" type="text" class="form-control"
+                                :placeholder="state.questions[0]?.option_c"
+                                id="option_c">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label" for="option_d">Option D</label>
+                                <input name="option_d" type="text" class="form-control"
+                                :placeholder="state.questions[0]?.option_d"
+                                id="option_d">
+                            </div>
+                            <!-- correct option -->
+                            <div class="mb-3">
+                                <span class="me-4">Correct Option*</span>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" required
+                                    name="correct_option" id="correct_option_a"
+                                    value="a">
+                                    <label class="form-check-label" for="correct_option_a">A</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" required
+                                    name="correct_option" id="correct_option_b"
+                                    value="b">
+                                    <label class="form-check-label" for="correct_option_b">B</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" required
+                                    name="correct_option" id="correct_option_c"
+                                    value="c">
+                                    <label class="form-check-label" for="correct_option_c">C</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" required
+                                    name="correct_option" id="correct_option_d"
+                                    value="d">
+                                    <label class="form-check-label" for="correct_option_d">D</label>
+                                </div>
+                            </div>
+                            <!-- score -->
+                            <div class="mb-3">
+                                <label class="form-label" for="score">Score*</label>
+                                <input name="score" type="number" class="form-control"
+                                :placeholder="state.questions[0]?.score"
+                                id="score" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" form="add-question" class="btn btn-success">
+                            <i class="bi bi-plus-lg me-1"></i>
+                            Add
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 

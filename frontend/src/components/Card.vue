@@ -15,10 +15,10 @@ defineProps({
                 <h2 class="card-title card-body display-6 ps-0 pt-0 mb-0">{{ heading }}</h2>
             </div>
             <div v-if="btn" class="d-flex justify-content-center align-items-center mx-4">
-                <button @click="btn?.func" class="btn btn-success">
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" :data-bs-target="`#${btn.modalId}`">
                     <i class="bi bi-plus-lg"></i>
                     {{ btn?.text }}
-                </button>   
+                </button>
             </div>
         </div>
         <div class="card-body">

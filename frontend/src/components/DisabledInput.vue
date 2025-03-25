@@ -20,12 +20,14 @@ const updateProp = (event) => {
 <style scoped>
 input {
     border: none;
-    padding: 2px;
+    padding: 2px 6px;
     outline: none;
     width: 100%;;
     font-family: inherit;
     font-size: inherit;
     color: inherit;
     cursor: text;
+    background-color: #efefef;
+    
 }
 </style>
