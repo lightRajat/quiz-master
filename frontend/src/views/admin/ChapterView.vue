@@ -89,12 +89,15 @@ onMounted(async () => {
             <div v-for="(question, index) in state.questions" :key="index" class="card m-5">
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
+                        <!-- question -->
                         <p class="h5">
                             <span class="me-3">{{ index + 1 }}.</span>
                             <DisabledInput :text="question.question"
                             :editable="question.editable"
                             @input-change="(newValue) => question.question = newValue" />
                         </p>
+
+                        <!-- edit delete buttons -->
                         <div class="btn-group" role="group">
                             <EditButton :editable="question.editable"
                             :func="() => editData(question.id)" />
@@ -103,6 +106,8 @@ onMounted(async () => {
                             @delete-success="deleteData(question.id)" resource-type="question" />
                         </div>
                     </div>
+
+                    <!-- options -->
                     <ul>
                         <div>
                             <li>
@@ -122,7 +127,7 @@ onMounted(async () => {
                                 </div>
                             </li>
                         </div>
-                        <div v-if="question.option_c">
+                        <div v-if="question.option_c || question.option_d || question.editable">
                             <li>
                                 <div>C. </div>
                                 <div>
@@ -141,6 +146,8 @@ onMounted(async () => {
                             </li>
                         </div>
                     </ul>
+
+                    <!-- correct option -->
                     <p>
                         Correct Option:
                         <span class="text-success">
@@ -149,6 +156,8 @@ onMounted(async () => {
                             @input-change="(newValue) => question.correct_option = newValue" />
                         </span>
                     </p>
+
+                    <!-- score -->
                     <p>
                         Score:
                         <span class="text-secondary">

@@ -1,272 +1,168 @@
 <script setup>
 import Card from '@/components/Card.vue';
-import DisabledInput from '@/components/DisabledInput.vue';
-import EditButton from '@/components/EditButton.vue';
-import DeleteButton from '@/components/DeleteButton.vue';
 import { api } from '@/utils/auth';
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, nextTick } from 'vue';
+import { useRoute } from 'vue-router';
+
+const route = useRoute();
 
 const state = reactive({
-    quizzes: [],
-    subjects: [],
-    chapters: [],
-    form: {
-        scope: 'subject',
-        subjectId: '',
+    subject: {},
+    quiz: {
+        id: '',
     },
+    chapters: [],
+    questions: {},
 });
 
-const btnData = {
-    text: "Add Quiz",
-    modalId: 'modal',
-}
-
-const editData = async (id) => {
-    const quiz = state.quizzes.find((item) => item.id == id);
-    quiz.editable = !quiz.editable;
-
-    // update data on server
-    if (!quiz.editable) {
-        try {
-            // prepare data
-            const { editable: value, subject_name: value2, ...dataToSend } = quiz;
-            if (dataToSend.chapter_name) {
-                delete dataToSend.chapter_id;
-            }
-            
-            const response = await api.put(`/quiz/${id}`, dataToSend);
-            window.showToast("Quiz Successfully Updated", 'success');
-        } catch (error) {
-            console.log(error.response?.data || error);
-        }
+const saveChanges = async () => {
+    const questionIds = Object.keys(state.questions).filter((key) => state.questions[key] === true);
+    const dataToSend = {
+        quiz_id: state.quiz.id,
+        question_ids: questionIds,
     }
-};
-
-const deleteData = (id) => {
-    // delete data on frontend
-    const itemIndex = state.quizzes.findIndex((item) => item.id == id);
-    state.quizzes.splice(itemIndex, 1);
-};
-
-const formElem = ref(null);
-const modalCloseBtnElem = ref(null);
-const addData = async () => {
-    // prepare data
-    const formData = new FormData(formElem.value);
-    if (formData.get('scope') === 'chapter') {
-        formData.delete('subject_id');
-    }
-
-    // send data to server
     try {
-        const response = await api.post("/quizzes", formData);
-        window.showToast("Quiz Successfully Added", 'success');
-        modalCloseBtnElem.value.click();
-        formElem.value.reset();
-
-        // add data to frontend
-        state.quizzes.unshift(response.data.data);
-        updateScopeNames();
+        const response = await api.post('/quiz-questions', dataToSend);
+        window.showToast("Questions Updated Successfully", 'success', response.data.info);
     } catch (error) {
-        window.showToast("Can't Add Quiz", 'danger', error.response.data.info);
+        console.log(error.response?.data || error);
+        window.showToast("Can't Update Questions", 'danger', error.response.data);
     }
 };
 
-const updateScopeNames = () => {
-    state.quizzes.forEach((quiz) => {
-        let chapter;
-        if (quiz.scope === 'chapter') {
-            chapter = state.chapters.find((chapter) => chapter.id == quiz.chapter_id);
-            quiz.chapter_name = chapter.name;
-        }
-        const subjectId = quiz.scope === 'subject' ? quiz.subject_id : chapter.subject_id;
+const toggleQuestion = (event) => {
+    state.questions[event.target.value] = event.target.checked;
+};
 
-        const subject = state.subjects.find((subject) => subject.id == subjectId);
-        quiz.subject_name = subject.name;
-    });
+const addRowClickability = () => {
+    const rows = document.querySelectorAll('.clickable-row');
+    for (const row of rows) {
+        row.addEventListener('click', (event) => {
+            if (event.target.classList.contains('form-check-input')) {
+                return;
+            }
+
+            const checkbox = row.querySelector('.form-check-input');
+            checkbox.click();
+        });
+    }
 };
 
 onMounted(async () => {
+    // retrieve quiz id
+    const pathSplit = route.path.split('/');
+    state.quiz.id = pathSplit[pathSplit.length - 1];
+
+    let response
+    // fetch quiz
     try {
-        // fetch subjects
-        let response = await api.get('/subjects');
-        state.subjects = response.data.data;
-
-        // fetch chapters
-        response = await api.get('/chapters');
-        state.chapters = response.data.data;
-
-        // fetch quizzes
-        response = await api.get('/quizzes');
-        state.quizzes = response.data.data;
-        state.quizzes.forEach((item) => item.editable = false);
-        updateScopeNames();
+        response = await api.get(`/quiz/${state.quiz.id}`);
+        state.quiz = response.data.data;
     } catch (error) {
         console.log(error.response?.data || error);
     }
+
+    // fetch subject and chapters
+    try {
+        if (state.quiz.scope === 'subject') {
+            // if scope subject
+            response = await api.get(`/subject/${state.quiz.subject_id}`);
+            state.subject = response.data.data;
+            
+            response = await api.get(`/chapters?subject_id=${state.subject.id}`);
+            state.chapters = response.data.data;
+        } else {
+            // if scope chapter
+            response = await api.get(`/chapter/${state.quiz.chapter_id}`);
+            state.chapters.push(response.data.data);
+
+            response = await api.get(`/subject/${state.chapters[0].subject_id}`);
+            state.subject = response.data.data;
+        }
+    } catch (error) {
+        console.log(error.response?.data || error);
+    }
+
+    // fetch questions
+    for (const chapter of state.chapters) {
+        response = await api.get(`/questions?chapter_id=${chapter.id}`);
+        chapter.questions = response.data.data;
+    }
+
+    // prepare questions data structure
+    for (const chapter of state.chapters) {
+        for (const question of chapter.questions) {
+            state.questions[question.id] = false;
+        }
+    }
+
+    // fetch quiz questions
+    response = await api.get(`/quiz-questions?quiz_id=${state.quiz.id}`);
+    response.data.data.forEach((question) => {
+        state.questions[question.question_id] = true;
+    });
+
+    await nextTick();
+    addRowClickability();
 });
 </script>
 
 <template>
-    <div class="m-5">
-        <Card heading="All Quizzes" :btn="btnData">
-            <table class="table table-striped table-hover align-middle">
+    <main class="container">
+        <h1 v-if="state.quiz.scope === 'subject'"
+        class="display-3 text-center me-5">{{ state.subject.name }}</h1>
+        <Card v-for="(chapter, chapterIndex) in state.chapters" :key="chapterIndex"
+        :heading="chapter.name" :subheading="state.quiz.scope === 'chapter' ? state.subject.name : ''">
+            
+            <table class="table table-hover align-middle">
                 <!-- table head -->
                 <thead>
                     <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Scope</th>
-                        <th scope="col">Time</th>
-                        <th scope="col">Description</th>
-                        <th scope="col">Action</th>
+                        <th scope="col">Question</th>
+                        <th scope="col">Select</th>
                     </tr>
                 </thead>
+
                 <!-- table body -->
                 <tbody class="table-group-divider">
-                    <tr v-for="(row, index) in state.quizzes" :key="index">
-                        <!-- id -->
-                        <th scope="row">{{ index + 1 }}</th>
-
-                        <!-- scope name -->
+                    <tr v-for="(question, questionIndex) in chapter.questions"
+                    :key="questionIndex" class="clickable-row">
+                        <th scope="row">{{ questionIndex + 1 }}</th>
+                        <td>{{ question.question }}</td>
                         <td>
-                            <h6 v-if="row.scope === 'chapter'" class="text-secondary">
-                                {{ row.subject_name }}
-                            </h6>
-                            <h5>
-                                {{ row.scope === 'subject' ? row.subject_name : row.chapter_name }}
-                            </h5>
-                        </td>
-
-                        <!-- time -->
-                        <td>
-                            <DisabledInput :text="row.time" :editable="row.editable"
-                            @input-change="(newValue) => row.time = newValue" /> mins
-                        </td>
-
-                        <!-- description -->
-                        <td>
-                            <DisabledInput :text="row.description" :editable="row.editable"
-                            @input-change="(newValue) => row.description = newValue" />
-                        </td>
-                        <td class="d-flex">
-                            <RouterLink :to="`#`"
-                            class="btn btn-primary d-flex me-3"
-                            style="width: fit-content;">
-                                <i class="bi bi-question-square me-1"></i>
-                                View Questions
-                            </RouterLink>
-                            <div class="btn-group" role="group">
-                                <EditButton :editable="row.editable"
-                                :func="() => editData(row.id)" />
-
-                                <DeleteButton :editable="row.editable" :id="row.id"
-                                resource-type="quiz" @delete-success="deleteData(row.id)" />
-                            </div>
+                            <input class="form-check-input" type="checkbox"
+                            :value="question.id" :checked="state.questions[question.id]"
+                            @change="toggleQuestion">
                         </td>
                     </tr>
-                    <tr v-if="state.quizzes.length === 0">
-                        <td colspan="4" class="text-center lead">No Data Available</td>
+
+                    <!-- no chapters placeholder -->
+                    <tr>
+                        <td v-if="!chapter.questions?.length" colspan="4" class="text-center lead">
+                            No Chapters Available
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </Card>
-
-        <div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <!-- header -->
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Add Quiz</h1>
-                        <button ref="modalCloseBtnElem" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-
-                    <!-- body -->
-                    <div class="modal-body">
-                        <form ref="formElem" id="add-data" @submit.prevent="addData">
-
-                            <!-- scope -->
-                            <div class="mb-3">
-                                <span class="me-4">Scope*</span>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" required
-                                    name="scope" id="scope_chapter" v-model="state.form.scope"
-                                    value="chapter" @change="fetchScopesForForm">
-                                    <label class="form-check-label" for="scope_chapter">Chapter</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" required
-                                    name="scope" id="scope_subject" v-model="state.form.scope"
-                                    value="subject" @change="fetchScopesForForm">
-                                    <label class="form-check-label" for="scope_subject">Subject</label>
-                                </div>
-                            </div>
-
-                            <!-- select subject -->
-                            <div class="mb-3">
-                                <label class="form-label">Select Subject*</label>
-                                <select class="form-select" name="subject_id" id="subject_id"
-                                v-model="state.form.subjectId">
-                                    <option v-for="(item, index) in state.subjects" :key="index"
-                                    :value="item.id">
-                                        {{ item.name }}
-                                    </option>
-                                </select>
-                            </div>
-
-                            <!-- select chapter -->
-                            <div class="mb-3" v-if="state.form.scope === 'chapter'">
-                                <label class="form-label">Select Chapter*</label>
-                                <select class="form-select" name="chapter_id">
-                                    <option v-for="(item, index) in state.chapters.filter((chapter) => chapter.subject_id == state.form.subjectId)" :key="index"
-                                    :value="item.id">
-                                        {{ item.name }}
-                                    </option>
-                                </select>
-                            </div>
-
-                            <!-- time -->
-                            <div class="mb-3">
-                                <label class="form-label" for="time">Time*</label>
-                                <input name="time" type="number" class="form-control"
-                                :placeholder="state.quizzes[0]?.time" id="time" required>
-                            </div>
-
-                            <!-- description -->
-                            <div class="mb-3">
-                                <label class="form-label" for="description">Description</label>
-                                <textarea name="description" type="text" class="form-control"
-                                :placeholder="state.quizzes[0]?.description" id="description"></textarea>
-                            </div>
-                        </form>
-                    </div>
-
-                    <!-- footer -->
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary"
-                        data-bs-dismiss="modal">Cancel</button>
-
-                        <button type="submit" form="add-data" class="btn btn-success">
-                            <i class="bi bi-plus-lg me-1"></i>
-                            Add
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+        <h2 v-if="!state.chapters.length" class="text-center lead">No Chapters Available</h2>
+    </main>
+    <button @click="saveChanges" class="btn btn-success" id="save-btn"
+    v-if="Object.keys(state.questions).length">
+        Save Changes
+    </button>
 </template>
 
 <style scoped>
-h5, h6 {
-    padding: 0;
-    margin: 0;
+.clickable-row {
+    cursor: pointer;
 }
 
-h6 {
-    font-size: 0.8rem;
-}
-
-h5 {
-    font-size: 1.4rem;
+#save-btn {
+    position: fixed;
+    bottom: 32px;
+    right: 64px;
+    z-index: 5;
 }
 </style>

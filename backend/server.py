@@ -26,7 +26,7 @@ api.add_resource(routes.SubjectApi, '/subjects', '/subject/<int:id>')
 api.add_resource(routes.ChapterApi, '/chapters', '/chapter/<int:id>')
 api.add_resource(routes.QuestionApi, '/questions', '/question/<int:id>')
 api.add_resource(routes.QuizApi, '/quizzes', '/quiz/<int:id>')
-api.add_resource(routes.QuizQuestionApi, '/quiz-questions', '/quiz-question/<int:id>')
+api.add_resource(routes.QuizQuestionApi, '/quiz-questions')
 api.add_resource(routes.UserApi, '/users', '/user/<int:user_id>')
 api.add_resource(routes.QuizAttemptApi, '/quiz-attempts', '/quiz-attempts/<int:qa_id>')
 

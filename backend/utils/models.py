@@ -63,9 +63,8 @@ class Quiz(db.Model):
     )
 
 class QuizQuestion(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    quiz_id = db.Column(db.Integer, ForeignKey('quiz.id'), nullable=False)
-    question_id = db.Column(db.Integer, ForeignKey('question.id'), nullable=False)
+    quiz_id = db.Column(db.Integer, ForeignKey('quiz.id'), nullable=False, primary_key=True)
+    question_id = db.Column(db.Integer, ForeignKey('question.id'), nullable=False, primary_key=True)
 
     __table_args__ = (UniqueConstraint('quiz_id', 'question_id', name="unique_quiz_question"), )
 

@@ -174,7 +174,7 @@ class QuizApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
     def put(self, id):
         return super().put(models.Quiz, id)
 
-class QuizQuestionApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
+class QuizQuestionApi(Resource):
     def get(self):
         quiz_id = request.args.get('quiz_id')
 
@@ -186,7 +186,6 @@ class QuizQuestionApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
         quiz_questions = []
         for result in results:
             quiz_question = {
-                'id': result.id,
                 'quiz_id': result.quiz_id,
                 'question_id': result.question_id,
             }
@@ -195,13 +194,18 @@ class QuizQuestionApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
         return Response.RESOURCE_FETCHED(quiz_questions)
     
     def post(self):
-        return super().post(models.QuizQuestion)
-    
-    def delete(self, id):
-        return super().delete(models.QuizQuestion, id)
-    
-    def put(self, id):
-        return super().put(models.QuizQuestion, id)
+        data = request.get_json()
+
+        # delete all previous associations
+        models.db.session.execute(models.db.delete(models.QuizQuestion).where(models.QuizQuestion.quiz_id == data['quiz_id']))
+
+        # add new associations
+        for question_id in data['question_ids']:
+            quiz_question = models.QuizQuestion(quiz_id=data['quiz_id'], question_id=question_id)
+            models.db.session.add(quiz_question)
+        models.db.session.commit()
+        
+        return Response.QUIZ_QUESTIONS_UPDATED
 
 class UserApi(Resource):
     @jwt_required()

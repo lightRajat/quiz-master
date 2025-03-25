@@ -14,7 +14,7 @@ const updateProp = (event) => {
 
 <template>
     <span v-if="!editable">{{ text || '--- No Data ---' }}</span>
-    <input v-else type="text" :value="text" @input="updateProp">
+    <input v-else type="text" :value="text" @change="updateProp">
 </template>
 
 <style scoped>

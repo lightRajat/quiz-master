@@ -12,8 +12,9 @@ import UserDashboard from '@/views/user/Dashboard.vue';
 import AdminHomeView from '@/views/admin/HomeView.vue';
 import AdminSubjectsView from '@/views/admin/SubjectsView.vue';
 import AdminSubjectView from '@/views/admin/SubjectView.vue';
-import AdminQuizView from '@/views/admin/QuizView.vue';
+import AdminQuizzesView from '@/views/admin/QuizzesView.vue';
 import AdminChapterView from '@/views/admin/ChapterView.vue';
+import AdminQuizView from '@/views/admin/QuizView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -30,9 +31,10 @@ const router = createRouter({
             children: [
                 {path: '/admin', name: 'admin-home', component: AdminHomeView, meta: {title: "Dashboard"}},
                 {path: '/admin/subjects', name: 'admin-subjects', component: AdminSubjectsView, meta: {title: "Subjects"}},
-                {path: '/admin/quizzes', name: 'admin-quiz', component: AdminQuizView, meta: {title: "Quizzes"}},
+                {path: '/admin/quizzes', name: 'admin-quizzes', component: AdminQuizzesView, meta: {title: "Quizzes"}},
                 {path: '/admin/subject/:subject_id', name: 'admin-subject', component: AdminSubjectView},
                 {path: '/admin/subject/:subject_id/:chapter_id', name: 'admin-chapter', component: AdminChapterView},
+                {path: '/admin/quizzes/:quiz_id', name: 'admin-quiz', component: AdminQuizView, meta: {title: "Edit Questions"}},
             ]
         },
         {
