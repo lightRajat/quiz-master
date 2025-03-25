@@ -115,6 +115,7 @@ onMounted(async () => {
                 </tbody>
             </table>
         </Card>
+
         <div class="modal fade" id="modal" tabindex="-1" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
@@ -122,13 +123,18 @@ onMounted(async () => {
                         <h1 class="modal-title fs-5" id="exampleModalLabel">Add Subject</h1>
                         <button ref="modalCloseBtnElem" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
+
+                    <!-- body -->
                     <div class="modal-body">
                         <form ref="formElem" id="add-subject" @submit.prevent="addData">
+                            <!-- name -->
                             <div class="mb-3">
                                 <label class="form-label" for="name">Name*</label>
                                 <input name="name" type="text" class="form-control"
                                 :placeholder="state.subjects[0]?.name" id="name" required>
                             </div>
+
+                            <!-- description -->
                             <div class="mb-3">
                                 <label class="form-label" for="description">Description</label>
                                 <textarea name="description" type="text" class="form-control"

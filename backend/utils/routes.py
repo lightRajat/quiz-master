@@ -52,7 +52,7 @@ class ChapterApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
             }
             return Response.RESOURCE_FETCHED(chapter)
         else:
-            subject_id = int(request.args.get('subject_id'))
+            subject_id = request.args.get('subject_id')
             if subject_id:
                 results = models.Chapter.query.filter_by(subject_id=subject_id).all()
             else:
