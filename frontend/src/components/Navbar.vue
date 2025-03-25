@@ -1,6 +1,5 @@
 <script setup>
 import { RouterLink, useRoute, useRouter } from 'vue-router';
-import { defineProps } from 'vue';
 import { logoutUser, getCurrentUser } from '@/utils/auth';
 
 const router = useRouter();

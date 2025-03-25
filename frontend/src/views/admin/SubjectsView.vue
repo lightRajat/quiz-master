@@ -5,6 +5,7 @@ import { api } from '@/utils/auth';
 import { RouterLink } from 'vue-router';
 import DisabledInput from '@/components/DisabledInput.vue';
 import EditButton from '@/components/EditButton.vue';
+import DeleteButton from '@/components/DeleteButton.vue';
 
 const state = reactive({
     subjects: []
@@ -33,6 +34,12 @@ const editData = async (id) => {
             console.log(error.response.data);
         }
     }
+};
+
+const deleteData = (id) => {
+    // delete data on frontend
+    const itemIndex = state.subjects.findIndex((item) => item.id == id);
+    state.subjects.splice(itemIndex, 1);
 };
 
 onMounted(async () => {
@@ -80,11 +87,9 @@ onMounted(async () => {
                             <div class="btn-group" role="group">
                                 <EditButton :editable="row.editable"
                                 :func="() => editData(row.id)" />
-                                <button class="btn btn-outline-danger"
-                                :disabled="row.editable">
-                                    <i class="bi bi-trash me-1"></i>
-                                    Delete
-                                </button>
+
+                                <DeleteButton :editable="row.editable" :id="row.id"
+                                resource-type="subject" @delete-success="deleteData(row.id)" />
                             </div>
                         </td>
                     </tr>

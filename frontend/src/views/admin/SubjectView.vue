@@ -5,6 +5,7 @@ import { onMounted, reactive } from 'vue';
 import { api } from '@/utils/auth';
 import DisabledInput from '@/components/DisabledInput.vue';
 import EditButton from '@/components/EditButton.vue';
+import DeleteButton from '@/components/DeleteButton.vue';
 
 const route = useRoute();
 
@@ -19,12 +20,6 @@ const btnData = {
         alert("chapter added");
     }
 }
-
-const addEditables = (obj) => {
-    obj.forEach((item) => {
-        item.editable = false;
-    });
-};
 
 const editData = async (id) => {
     const chapter = state.chapters.find((item) => item.id === id);
@@ -44,16 +39,22 @@ const editData = async (id) => {
     }
 };
 
+const deleteData = (id) => {
+    // delete data on frontend
+    const itemIndex = state.chapters.findIndex((item) => item.id == id);
+    state.chapters.splice(itemIndex, 1);
+};
+
 onMounted(async () => {
     const pathSplit = route.path.split('/');
     state.subject.id = pathSplit[pathSplit.length - 1];
     try {
-        // fecth chapters
+        // fetch chapters
         let response = await api.get(`/chapters?subject_id=${state.subject.id}`);
         state.chapters = response.data.data;
-        addEditables(state.chapters);
+        state.chapters.forEach((item) => item.editable = false);
 
-        // fecth subject name
+        // fetch subject name
         response = await api.get(`/subject/${state.subject.id}`);
         state.subject.name = response.data.data.name;
         document.title = state.subject.name;
@@ -98,10 +99,8 @@ onMounted(async () => {
                                 <EditButton :editable="row.editable"
                                 :func="() => editData(row.id)" />
 
-                                <button class="btn btn-outline-danger">
-                                    <i class="bi bi-trash me-1"></i>
-                                    Delete
-                                </button>
+                                <DeleteButton :editable="row.editable" :id="row.id"
+                                resource-type="chapter" @delete-success="deleteData" />
                             </div>
                         </td>
                     </tr>

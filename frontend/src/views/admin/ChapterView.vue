@@ -5,6 +5,7 @@ import { api } from '@/utils/auth';
 import { useRoute } from 'vue-router';
 import DisabledInput from '@/components/DisabledInput.vue';
 import EditButton from '@/components/EditButton.vue';
+import DeleteButton from '@/components/DeleteButton.vue';
 
 const route = useRoute();
 
@@ -38,6 +39,12 @@ const editData = async (id) => {
             console.log(error.response?.data || error);
         }
     }
+};
+
+const deleteData = (id) => {
+    // delete data on frontend
+    const itemIndex = state.questions.findIndex((item) => item.id == id);
+    state.questions.splice(itemIndex, 1);
 };
 
 onMounted(async () => {
@@ -76,10 +83,8 @@ onMounted(async () => {
                             <EditButton :editable="question.editable"
                             :func="() => editData(question.id)" />
 
-                            <button class="btn btn-outline-danger">
-                                <i class="bi bi-trash me-2"></i>
-                                Delete
-                            </button>
+                            <DeleteButton :editable="question.editable" :id="question.id"
+                            @delete-success="deleteData(question.id)" resource-type="question" />
                         </div>
                     </div>
                     <ul>

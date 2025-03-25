@@ -56,6 +56,9 @@ api.interceptors.response.use((response) => {
   return response;
 }, (error) => {
   if (error.response) {
+    if (error.response.data) {
+      error.response.data = JSON.parse(error.response.data);
+    }
     const statusCode = error.response.status;
     if (statusCode === 401 || statusCode === 403) {
       window.location.href = '/unauthorized';
