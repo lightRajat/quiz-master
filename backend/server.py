@@ -29,7 +29,7 @@ api.add_resource(routes.QuizApi, '/quizzes', '/quiz/<int:id>')
 api.add_resource(routes.QuizQuestionApi, '/quiz-questions')
 api.add_resource(routes.UserApi, '/users', '/user/<int:user_id>')
 api.add_resource(routes.AttemptApi, '/attempts', '/attempt/<int:id>')
-api.add_resource(routes.AttemptQuizApi, '/attempt-questions/<int:attempt_id>', '/attempt-questions')
+api.add_resource(routes.AttemptQuestionApi, '/attempt-questions')
 
 @app.route('/login', methods=['POST'])
 def login():

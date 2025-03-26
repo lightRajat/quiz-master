@@ -351,7 +351,7 @@ class AttemptApi(Resource):
             models.db.session.add(resource)
             models.db.session.commit()
 
-            created_resource = {**data, 'id': resource.id, 'date_attempted': resource.date_attempted}
+            created_resource = {**data, 'id': resource.id, 'date_attempted': resource.date_attempted.isoformat()}
             return Response.RESOURCE_CREATED(created_resource)
         except IntegrityError as e:
             error_msg = str(e.orig)
@@ -367,8 +367,8 @@ class AttemptApi(Resource):
         finally:
             models.db.session.rollback()
 
-class AttemptQuizApi(Resource):
-    def get(self, attempt_id: int):
+class AttemptQuestionApi(Resource):
+    def get(self):
         results = models.AttemptQuestion.query.filter_by(attempt_id=attempt_id).all()
 
         attempt_questions = []
@@ -376,8 +376,8 @@ class AttemptQuizApi(Resource):
             attempt_question = {
                 'attempt_id': result.attempt_id,
                 'question_id': result.question_id,
-                'option_selected': result.option_selected,
-                'correct_option': result.correct_option,
+                'selected_answer': result.selected_answer,
+                'correct_answer': result.correct_answer,
             }
             attempt_questions.append(attempt_question)
         
@@ -385,13 +385,14 @@ class AttemptQuizApi(Resource):
     
     def post(self):
         data = request.get_json()
+        print(data)
 
         for question in data['questions']:
             attempt_question = models.AttemptQuestion(
                 attempt_id = data['attempt_id'],
                 question_id = question['question_id'],
-                option_selected = question['option_selected'],
-                correct_option = question['correct_option'],
+                selected_answer = question['selected_answer'],
+                correct_answer = question['correct_answer'],
             )
             models.db.session.add(attempt_question)
         models.db.session.commit()

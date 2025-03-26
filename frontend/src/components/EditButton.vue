@@ -1,7 +1,7 @@
 <script setup>
 defineProps({
     editable: Boolean,
-    func: Object,
+    func: Function,
 });
 </script>
 

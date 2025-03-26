@@ -81,5 +81,5 @@ class Attempt(db.Model):
 class AttemptQuestion(db.Model):
     attempt_id = db.Column(db.Integer, ForeignKey('attempt.id'), nullable=False, primary_key=True)
     question_id = db.Column(db.Integer, ForeignKey('question.id'), nullable=False, primary_key=True)
-    option_selected = db.Column(db.String(255), nullable=True)
-    correct_option = db.Column(db.String(255), nullable=False)
+    selected_answer = db.Column(db.String(255), nullable=False)
+    correct_answer = db.Column(db.String(255), nullable=False)

@@ -98,7 +98,7 @@ onMounted(async () => {
                         </p>
 
                         <!-- edit delete buttons -->
-                        <div class="btn-group" role="group">
+                        <div class="btn-group ms-1" role="group">
                             <EditButton :editable="question.editable"
                             :func="() => editData(question.id)" />
 

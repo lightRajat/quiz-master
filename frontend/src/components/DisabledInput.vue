@@ -1,7 +1,7 @@
 <script setup>
 
 defineProps({
-    text: String,
+    text: [String, Number],
     editable: Boolean,
 });
 
