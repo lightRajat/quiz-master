@@ -160,7 +160,7 @@ onMounted(async () => {
         </div>
 
         <Card heading="Quizzes">
-            <table class="table table-striped table-hover align-middle">
+            <table class="table table-hover align-middle">
                 <!-- table head -->
                 <thead>
                     <tr>

@@ -28,19 +28,22 @@ const deleteData = async (id) => {
 
 <template>
     <button class="btn btn-outline-danger" :disabled="editable"
-    @click="deleteData(id)">
+    @click="deleteData(id)" :class="{'delete-btn': !editable, 'disabled': editable}">
         <i class="bi bi-trash me-1"></i>
         Delete
     </button>
 </template>
 
 <style scoped>
-button {
-    opacity: 0;
+.delete-btn {
+    opacity: 0.8;
     transition: all 0.2s ease-out;
 }
-tr:hover button {
+tr:hover .delete-btn {
     opacity: 1;
     transition: none;
+}
+.disabled {
+    opacity: 0.1;
 }
 </style>

@@ -7,7 +7,7 @@ defineProps({
 
 <template>
     <button class="btn" @click="func"
-    :class="`btn-${editable ? 'success' : 'outline-secondary'}`">
+    :class="{'btn-success': editable, 'btn-outline-secondary edit-btn' : !editable}">
         <i class="bi me-1"
         :class="`bi-${editable ? 'check-lg' : 'pencil'}`"></i>
         {{ editable ? 'Done' : 'Edit' }}
@@ -15,11 +15,11 @@ defineProps({
 </template>
 
 <style scoped>
-button {
-    opacity: 0;
+.edit-btn {
+    opacity: 0.6;
     transition: all 0.2s ease-out;
 }
-tr:hover button {
+tr:hover .edit-btn {
     opacity: 1;
     transition: none;
 }

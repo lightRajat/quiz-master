@@ -25,9 +25,10 @@ input {
     width: 100%;;
     font-family: inherit;
     font-size: inherit;
-    color: inherit;
+    color: #000;
     cursor: text;
-    background-color: #efefef;
+    background-color: #f4fcff;
+    border-radius: 6px;
     
 }
 </style>
