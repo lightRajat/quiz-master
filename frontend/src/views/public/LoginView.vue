@@ -4,8 +4,8 @@ import { reactive } from 'vue';
 import { loginUser } from '@/utils/auth';
 
 const state = reactive({
-    email: 'admin',
-    password: 'admin'
+    email: 'main',
+    password: 'main'
 });
 const router = useRouter();
 
@@ -32,7 +32,8 @@ const handleSubmit = async () => {
         <form @submit.prevent="handleSubmit">
             <div class="mb-3">
                 <label class="form-label" for="email">Email</label>
-                <input v-model="state.email" name="email" type="text" class="form-control" placeholder="or enter your username" id="email"
+                <input v-model="state.email" name="email" type="text" class="form-control"
+                placeholder="or enter your username" id="email"
                     required>
             </div>
             <div class="mb-3">

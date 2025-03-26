@@ -8,13 +8,14 @@ import NotFoundView from '@/views/public/NotFoundView.vue';
 import UnauthorizedView from '@/views/public/UnauthorizedView.vue';
 
 import AdminDashboard from '@/components/admin/AdminDashboard.vue';
-import UserDashboard from '@/views/user/Dashboard.vue';
 import AdminHomeView from '@/views/admin/HomeView.vue';
 import AdminSubjectsView from '@/views/admin/SubjectsView.vue';
 import AdminSubjectView from '@/views/admin/SubjectView.vue';
 import AdminQuizzesView from '@/views/admin/QuizzesView.vue';
 import AdminChapterView from '@/views/admin/ChapterView.vue';
 import AdminQuizView from '@/views/admin/QuizView.vue';
+
+import UserDashboard from '@/components/user/UserDashboard.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,6 +40,9 @@ const router = createRouter({
         },
         {
             path: '/user/:username', name: 'user-dashboard', component: UserDashboard, meta: {requiresAuth: true},
+            children: [
+                
+            ]
         },
         {path: '/:catchAll(.*)', name: 'not-found', component: NotFoundView, meta: {title: "404 Not Found"}},
         {path: '/unauthorized', name: 'unauthorized', component: UnauthorizedView, meta: {title: "Not Authorized"}}
