@@ -89,10 +89,13 @@ onMounted(async () => {
                         <tr v-for="(row, rowIndex) in state.quizzes.slice(0, state.subjects.length < limit ? state.subjects.length : limit)" :key="rowIndex">
                             <th scope="row">{{ rowIndex + 1 }}</th>
                             <td>{{ row.scope_name }}</td>
-                            <td>{{ row.time }} m</td>
+                            <td>{{ row.time }} mins</td>
                             <td>
-                                <RouterLink to="#" class="btn btn-outline-secondary d-flex" style="width: fit-content;">
-                                    <i class="bi bi-info"></i> View
+                                <RouterLink :to="`/admin/quizzes/${row.id}`"
+                                class="btn btn-primary d-flex me-3"
+                                style="width: fit-content;">
+                                    <i class="bi bi-question-square me-2"></i>
+                                    Edit Questions
                                 </RouterLink>
                             </td>
                         </tr>

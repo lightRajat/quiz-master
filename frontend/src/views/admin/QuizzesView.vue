@@ -148,6 +148,8 @@ onMounted(async () => {
                             <DisabledInput :text="row.description" :editable="row.editable"
                             @input-change="(newValue) => row.description = newValue" />
                         </td>
+
+                        <!-- actions -->
                         <td class="d-flex">
                             <RouterLink :to="`/admin/quizzes/${row.id}`"
                             class="btn btn-primary d-flex me-3"
@@ -155,6 +157,7 @@ onMounted(async () => {
                                 <i class="bi bi-question-square me-2"></i>
                                 Edit Questions
                             </RouterLink>
+                            
                             <div class="btn-group" role="group">
                                 <EditButton :editable="row.editable"
                                 :func="() => editData(row.id)" />

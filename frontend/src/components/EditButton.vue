@@ -13,3 +13,14 @@ defineProps({
         {{ editable ? 'Done' : 'Edit' }}
     </button>
 </template>
+
+<style scoped>
+button {
+    opacity: 0;
+    transition: all 0.2s ease-out;
+}
+tr:hover button {
+    opacity: 1;
+    transition: none;
+}
+</style>
