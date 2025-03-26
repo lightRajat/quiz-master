@@ -265,17 +265,17 @@ class UserApi(Resource):
 
         return Response.RESOURCE_FETCHED(user)
         
-class QuizAttemptApi(Resource):
+class AttemptApi(Resource):
     @jwt_required()
-    def get(self, qa_id: int = None):
+    def get(self, id: int = None):
         token_user_id = get_jwt_identity()
         
         # if admin
         if token_user_id == 'admin':
-            # if requested for quiz attempt with id
-            if qa_id:
+            # if requested for attempt with key id
+            if id:
                 # check if exists
-                result = models.QuizAttempt.query.get(qa_id)
+                result = models.Attempt.query.get(id)
                 if result:
                     quiz_attempt = {
                         'id': result.id,
@@ -283,31 +283,48 @@ class QuizAttemptApi(Resource):
                         'user_id': result.user_id,
                         'date_attempted': get(result.date_attempted),
                         'time_taken': result.time_taken,
-                        'score': result.score
+                        'score': result.score,
+                        'total_time': result.total_time,
+                        'total_score': result.total_score
                     }
                     return Response.RESOURCE_FETCHED(quiz_attempt)
                 else:
                     return Response.RESOURCE_NOT_FOUND
             else:
                 # if requested for one user
-                user_id = int(request.args.get('user_id'))
+                user_id = request.args.get('user_id')
                 if user_id:
-                    results = models.QuizAttempt.query.filter_by(user_id=user_id).all()
+                    results = models.Attempt.query.filter_by(user_id=user_id).all()
                 else:
-                    results = models.QuizAttempt.query.all()
+                    results = models.Attempt.query.all()
         else:
-            # if requested for quiz attempt with id
-            if qa_id:
-                return Response.UNAUTHORIZED
+            # if requested for attempt with key id
+            if id:
+                # check auth
+                result = models.Attempt.query.get(id)
+                if result and result.user_id == token_user_id:
+                    quiz_attempt = {
+                        'id': result.id,
+                        'quiz_id': result.quiz_id,
+                        'user_id': result.user_id,
+                        'date_attempted': get(result.date_attempted),
+                        'time_taken': result.time_taken,
+                        'score': result.score,
+                        'total_time': result.total_time,
+                        'total_score': result.total_score
+                    }
+                    return Response.RESOURCE_FETCHED(quiz_attempt)
+                else:
+                    return Resource.UNAUTHORIZED
             else:
                 # if requested for one user
-                user_id = int(request.args.get('user_id'))
+                user_id = request.args.get('user_id')
                 if user_id:
-                    # if not requested for himself
+                    # check auth
                     if token_user_id != user_id:
                         return Response.UNAUTHORIZED
                     else:
-                        results = models.QuizAttempt.query.filter_by(user_id=user_id).all()
+                        results = models.Attempt.query.filter_by(user_id=user_id).all()
                 else:
                     return Response.UNAUTHORIZED
 
@@ -319,8 +336,33 @@ class QuizAttemptApi(Resource):
                 'quiz_id': result.quiz_id,
                 'date_attempted': get(result.date_attempted),
                 'time_taken': result.time_taken,
-                'score': result.score
+                'score': result.score,
+                'total_time': result.total_time,
+                'total_score': result.total_score
             }
             quiz_attempts.append(quiz_attempt)
 
         return Response.RESOURCE_FETCHED(quiz_attempts)
+    
+    def post(self):
+        data = request.form
+        try:
+            resource = models.Attempt(**data)
+            models.db.session.add(resource)
+            models.db.session.commit()
+
+            created_resource = {**data, 'id': resource.id, 'date_attempted': resource.date_attempted}
+            return Response.RESOURCE_CREATED(created_resource)
+        except IntegrityError as e:
+            error_msg = str(e.orig)
+            if 'FOREIGN KEY constraint failed' in error_msg:
+                return Response.INVALID_FOREIGN_KEY
+            else:
+                return Response.INVALID_DATA
+        except StatementError:
+            return Response.INVALID_DATA
+        except Exception as e:
+            print(f"Error creating resource: {e}")
+            return Response.INTERNAL_SERVER_ERROR
+        finally:
+            models.db.session.rollback()

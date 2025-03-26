@@ -155,13 +155,16 @@ def add_sample_data():
                 score = int(row[4])
 
                 user = User.query.filter_by(username = user_name).first()
+                quiz = Quiz.query.get(quiz_id)
                 
-                quiz_attempt = QuizAttempt(
+                quiz_attempt = Attempt(
                     user_id = user.id,
                     quiz_id = quiz_id,
                     date_attempted = date_attempted,
                     time_taken = time_taken,
-                    score = score
+                    score = score,
+                    total_time = quiz.time,
+                    total_score = score,
                 )
 
                 db.session.add(quiz_attempt)

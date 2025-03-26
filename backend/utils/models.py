@@ -68,10 +68,12 @@ class QuizQuestion(db.Model):
 
     __table_args__ = (UniqueConstraint('quiz_id', 'question_id', name="unique_quiz_question"), )
 
-class QuizAttempt(db.Model):
+class Attempt(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, ForeignKey('user.id'), nullable=False)
     quiz_id = db.Column(db.Integer, ForeignKey('quiz.id'), nullable=False)
     date_attempted = db.Column(db.Date, default=lambda: datetime.utcnow().date(), nullable=False)
     time_taken = db.Column(db.Integer, nullable=False)
     score = db.Column(db.Integer, nullable=False)
+    total_time = db.Column(db.Integer, nullable=False)
+    total_score = db.Column(db.Integer, nullable=False)
