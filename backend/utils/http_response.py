@@ -14,7 +14,7 @@ class Response:
     FOREIGN_KEY_DEPENDENT = dumps({'status': 'failed', 'info': 'Has Foreign Key Dependencies'}), 409
     RESOURCE_UPDATED = dumps({'status': 'success', 'info': 'Resource Successfully Updated'}), 200
     INTERNAL_SERVER_ERROR = dumps({'status': 'failed', 'info': 'Internal Server Error'}), 500
-    QUIZ_QUESTIONS_UPDATED = dumps({'status': 'success', 'info': 'Quiz Questions Updated'}), 200
+    QUESTIONS_UPDATED = dumps({'status': 'success', 'info': 'Questions Updated'}), 200
 
     @staticmethod
     def USER_LOGGED(user, token):

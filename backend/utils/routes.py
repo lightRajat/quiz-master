@@ -205,7 +205,7 @@ class QuizQuestionApi(Resource):
             models.db.session.add(quiz_question)
         models.db.session.commit()
         
-        return Response.QUIZ_QUESTIONS_UPDATED
+        return Response.QUESTIONS_UPDATED
 
 class UserApi(Resource):
     @jwt_required()
@@ -366,3 +366,34 @@ class AttemptApi(Resource):
             return Response.INTERNAL_SERVER_ERROR
         finally:
             models.db.session.rollback()
+
+class AttemptQuizApi(Resource):
+    def get(self, attempt_id: int):
+        results = models.AttemptQuestion.query.filter_by(attempt_id=attempt_id).all()
+
+        attempt_questions = []
+        for result in results:
+            attempt_question = {
+                'attempt_id': result.attempt_id,
+                'question_id': result.question_id,
+                'option_selected': result.option_selected,
+                'correct_option': result.correct_option,
+            }
+            attempt_questions.append(attempt_question)
+        
+        return Response.RESOURCE_FETCHED(attempt_questions)
+    
+    def post(self):
+        data = request.get_json()
+
+        for question in data['questions']:
+            attempt_question = models.AttemptQuestion(
+                attempt_id = data['attempt_id'],
+                question_id = question['question_id'],
+                option_selected = question['option_selected'],
+                correct_option = question['correct_option'],
+            )
+            models.db.session.add(attempt_question)
+        models.db.session.commit()
+        
+        return Response.QUESTIONS_UPDATED
