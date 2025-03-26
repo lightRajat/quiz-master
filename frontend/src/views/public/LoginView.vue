@@ -4,8 +4,8 @@ import { reactive } from 'vue';
 import { loginUser } from '@/utils/auth';
 
 const state = reactive({
-    email: 'main',
-    password: 'main'
+    email: 'aliceb',
+    password: 'aliceb'
 });
 const router = useRouter();
 
@@ -16,7 +16,6 @@ const handleSubmit = async () => {
         state.email = '',
         state.password = ''
     } else {
-        window.showToast("Successfully Logged In", 'success', `Welcome ${response.user}`);
         if (response.user === 'admin') {
             router.push('/admin');
         } else {

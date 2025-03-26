@@ -46,7 +46,7 @@ def login():
         user = User.query.filter(or_(User.username == email, User.email == email)).first()
         if user:
             if user.check_password(password):
-                return Response.USER_LOGGED(user.username, create_access_token(identity=user.id))
+                return Response.USER_LOGGED(user.id, create_access_token(identity=user.id))
             else:
                 return Response.INCORRECT_PASSWORD
         else:

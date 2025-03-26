@@ -11,9 +11,13 @@ const leftLinks = [
 ];
 const editProfileLink = "#";
 const maxWidth = '940px';
+
+// welcome msg
+window.showToast("Successfully Logged In", 'success', "Welcome Admin");
 </script>
 
 <template>
-    <Navbar :leftLinks="leftLinks" :editProfileLink="editProfileLink" :maxWidth="maxWidth" />
+    <Navbar :leftLinks="leftLinks" :editProfileLink="editProfileLink"
+    :maxWidth="maxWidth" userName="Admin" />
     <RouterView />
 </template>
