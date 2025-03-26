@@ -6,8 +6,7 @@ import { onMounted, ref } from 'vue';
 import { api } from '@/utils/auth';
 
 const leftLinks = [
-    { text: 'Home', link: `/user/${getCurrentUser()}` },
-    { text: 'Quizzes', link: '#' },
+    { text: 'Quizzes', link: `/user/${getCurrentUser()}` },
     { text: 'Attempts', link: '#' },
 ];
 const editProfileLink = "#";

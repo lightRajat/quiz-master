@@ -42,7 +42,8 @@ const isLinkActive = (link) => {
             <div class="mx-5 navbar-nav">
                 <RouterLink v-for="(link, index) in leftLinks" :key="index"
                 class="nav-link" :to="link.link" :class="isLinkActive(link.link) ? 'active' : ''">
-                    <i v-if="index === 0" class="bi bi-house"></i>
+                    <i v-if="index === 0 && userName === 'Admin'" class="bi bi-house"></i>
+                    <i v-if="index === 0 && userName !== 'Admin'" class="bi bi-card-checklist"></i>
                     {{ link.text }}
                 </RouterLink>
             </div>

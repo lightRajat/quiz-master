@@ -16,6 +16,7 @@ import AdminChapterView from '@/views/admin/ChapterView.vue';
 import AdminQuizView from '@/views/admin/QuizView.vue';
 
 import UserDashboard from '@/components/user/UserDashboard.vue';
+import UserQuizzesView from '@/views/user/QuizzesView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -39,9 +40,9 @@ const router = createRouter({
             ]
         },
         {
-            path: '/user/:username', name: 'user-dashboard', component: UserDashboard, meta: {requiresAuth: true},
+            path: '/user/:user_id', name: 'user-dashboard', component: UserDashboard, meta: {requiresAuth: true},
             children: [
-                
+                {path: '/user/:user_id', name: 'user-quizzes', component: UserQuizzesView, meta: {title: "Quizzes"}},
             ]
         },
         {path: '/:catchAll(.*)', name: 'not-found', component: NotFoundView, meta: {title: "404 Not Found"}},

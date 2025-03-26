@@ -152,7 +152,7 @@ onMounted(async () => {
                         <!-- actions -->
                         <td class="d-flex">
                             <RouterLink :to="`/admin/quizzes/${row.id}`"
-                            class="btn btn-primary d-flex me-3"
+                            class="btn btn-primary d-flex me-3 my-1"
                             style="width: fit-content;">
                                 <i class="bi bi-question-square me-2"></i>
                                 Edit Questions
