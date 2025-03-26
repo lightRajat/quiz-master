@@ -1,7 +1,7 @@
 <script setup>
 import Card from '@/components/Card.vue';
 import { reactive, onMounted, watch } from 'vue';
-import { api } from '@/utils/auth';
+import { api, getCurrentUser } from '@/utils/auth';
 import { RouterLink } from 'vue-router';
 
 const state = reactive({
@@ -201,7 +201,7 @@ onMounted(async () => {
 
                         <!-- actions -->
                         <td class="d-flex">
-                            <RouterLink to="#"
+                            <RouterLink :to="`/user/${getCurrentUser()}/quiz/${row.id}/take`"
                             class="btn btn-primary d-flex me-3 my-1 action-link"
                             style="width: fit-content;">
                                 <i class="bi bi-pencil-square me-2"></i>

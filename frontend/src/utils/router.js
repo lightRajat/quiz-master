@@ -17,6 +17,7 @@ import AdminQuizView from '@/views/admin/QuizView.vue';
 
 import UserDashboard from '@/components/user/UserDashboard.vue';
 import UserQuizzesView from '@/views/user/QuizzesView.vue';
+import TakeAttemptView from '@/views/user/TakeAttemptView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,6 +44,7 @@ const router = createRouter({
             path: '/user/:user_id', name: 'user-dashboard', component: UserDashboard, meta: {requiresAuth: true},
             children: [
                 {path: '/user/:user_id', name: 'user-quizzes', component: UserQuizzesView, meta: {title: "Quizzes"}},
+                {path: '/user/:user_id/quiz/:quiz_id/take', name: 'user-quiz-take', component: TakeAttemptView, meta: {title: "Quiz"}},
             ]
         },
         {path: '/:catchAll(.*)', name: 'not-found', component: NotFoundView, meta: {title: "404 Not Found"}},
@@ -66,9 +68,12 @@ router.beforeEach((to, from, next) => {
         const currUser = getCurrentUser();
         if (pageOf !== currUser) {
             next('/unauthorized');
+        } else {
+            next();
         }
+    } else {
+        next();
     }
-    next();
 });
 
 export default router;
