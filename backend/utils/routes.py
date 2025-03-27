@@ -416,6 +416,8 @@ class AttemptApi(Resource):
 
 class AttemptQuestionApi(Resource):
     def get(self):
+        attempt_id = request.args.get('attempt_id')
+
         results = models.AttemptQuestion.query.filter_by(attempt_id=attempt_id).all()
 
         attempt_questions = []
