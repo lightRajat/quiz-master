@@ -8,6 +8,25 @@ const state = reactive({
     attempts: [],
 });
 
+const downloadData = () => {
+    // prepare the csv
+    const csvContents = ['quiz_scope,subject_name,chapter_name,date_attempted,total_time,time_taken,total_score,score_obtained'];
+    for (const attempt of state.attempts) {
+        const row = `${attempt.scope},${attempt.subject_name},${attempt.chapter_name || ''},${attempt.date_attempted},${attempt.total_time},${attempt.time_taken},${attempt.total_score},${attempt.score}`;
+        csvContents.push(row);
+    }
+    const csvString = csvContents.join('\n');
+    
+    // make the download through anchor tag
+    const anchorElem = document.createElement('a');
+    anchorElem.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvString));
+    anchorElem.setAttribute('download', 'quizAttemptsData.csv');
+    anchorElem.style.display = 'none';
+    document.body.appendChild(anchorElem);
+    anchorElem.click();
+    document.body.removeChild(anchorElem);
+};
+
 const updateScopeNames = async () => {
     try {
         for (const attempt of state.attempts) {
@@ -47,6 +66,10 @@ onMounted(async () => {
 <template>
     <div class="m-5">
         <Card heading="Your Quiz Attempts">
+            <button @click="downloadData" class="btn btn-primary download-btn">
+                <i class="bi bi-download me-1"></i>
+                Download Data as CSV
+            </button>
             <table class="table table-striped table-hover align-middle">
                 <!-- table head -->
                 <thead>
@@ -119,5 +142,10 @@ h5 {
 }
 .score {
     font-size: 22px;
+}
+.download-btn {
+    position: absolute;
+    top: 28px;
+    left: 50px;
 }
 </style>
