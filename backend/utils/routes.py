@@ -1,7 +1,7 @@
 from flask_restful import Resource
 from flask import request
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from utils.commons import get
+from utils import commons
 from utils.http_response import Response
 from utils.mixins import *
 
@@ -226,14 +226,14 @@ class UserApi(Resource):
                         'name': result.name,
                         'email': result.email,
                         'username': result.username,
-                        'date_joined': get(result.date_joined),
+                        'date_joined': commons.get(result.date_joined),
                         'qualification': result.qualification,
-                        'dob': get(result.dob),
-                        'date_account_deleted': get(result.date_account_deleted),
+                        'dob': commons.get(result.dob),
+                        'date_account_deleted': commons.get(result.date_account_deleted),
                         'profile_pic': ''
                     }
                     if result.profile_pic:
-                        user['profile_pic'] = f"uploads/{result.profile_pic}"
+                        user['profile_pic'] = f"/uploads/{result.profile_pic}"
                     users.append(user)
                 return Response.RESOURCE_FETCHED(users)
         else:
@@ -254,16 +254,62 @@ class UserApi(Resource):
             'name': result.name,
             'email': result.email,
             'username': result.username,
-            'date_joined': get(result.date_joined),
+            'date_joined': commons.get(result.date_joined),
             'qualification': result.qualification,
-            'dob': get(result.dob),
-            'date_account_deleted': get(result.date_account_deleted),
+            'dob': commons.get(result.dob),
+            'date_account_deleted': commons.get(result.date_account_deleted),
             'profile_pic': ''
         }
         if result.profile_pic:
             user['profile_pic'] = f"uploads/{result.profile_pic}"
 
         return Response.RESOURCE_FETCHED(user)
+    
+    @jwt_required()
+    def put(self, user_id):
+        token_user_id = get_jwt_identity()
+        if token_user_id != user_id:
+            return Response.UNAUTHORIZED
+
+        resource = models.User.query.get(user_id)
+        if not resource:
+            return Response.RESOURCE_NOT_FOUND
+
+        data = request.form
+        try:
+            if data['username'] != resource.username:
+                setattr(resource, 'username', data['username'])
+            if data['email'] != resource.email:
+                setattr(resource, 'email', data['email'])
+
+            setattr(resource, 'name', data['name'])
+            setattr(resource, 'qualification', data['qualification'] if data['qualification'] else None)
+            dob = commons.get_date_from_string(data['dob']) if data['dob'] else None
+            setattr(resource, 'dob', dob)
+            if data['password']:
+                resource.set_password(data['password'])
+
+            if request.files['image'].filename:
+                commons.save_profile_pic(request.files['image'], resource)
+
+            models.db.session.commit()
+            return Response.RESOURCE_UPDATED
+        except IntegrityError as e:
+            error_msg = str(e.orig)
+            if 'FOREIGN KEY constraint failed' in error_msg:
+                return Response.INVALID_FOREIGN_KEY
+            elif 'UNIQUE constraint failed' in error_msg:
+                return Response.EMAIL_ALREADY_EXISTS
+            else:
+                return Response.INVALID_DATA
+        except StatementError as se:
+            print(se)
+            return Response.INVALID_DATA
+        except Exception as e:
+            print(f"Error updating resource: {e}")
+            return Response.INTERNAL_SERVER_ERROR
+        finally:
+            models.db.session.rollback()
         
 class AttemptApi(Resource):
     @jwt_required()
@@ -281,7 +327,7 @@ class AttemptApi(Resource):
                         'id': result.id,
                         'quiz_id': result.quiz_id,
                         'user_id': result.user_id,
-                        'date_attempted': get(result.date_attempted),
+                        'date_attempted': commons.get(result.date_attempted),
                         'time_taken': result.time_taken,
                         'score': result.score,
                         'total_time': result.total_time,
@@ -307,7 +353,7 @@ class AttemptApi(Resource):
                         'id': result.id,
                         'quiz_id': result.quiz_id,
                         'user_id': result.user_id,
-                        'date_attempted': get(result.date_attempted),
+                        'date_attempted': commons.get(result.date_attempted),
                         'time_taken': result.time_taken,
                         'score': result.score,
                         'total_time': result.total_time,
@@ -335,7 +381,7 @@ class AttemptApi(Resource):
                 'id': result.id,
                 'user_id': result.user_id,
                 'quiz_id': result.quiz_id,
-                'date_attempted': get(result.date_attempted),
+                'date_attempted': commons.get(result.date_attempted),
                 'time_taken': result.time_taken,
                 'score': result.score,
                 'total_time': result.total_time,

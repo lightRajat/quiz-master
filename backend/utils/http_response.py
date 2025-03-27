@@ -16,6 +16,7 @@ class Response:
     INTERNAL_SERVER_ERROR = dumps({'status': 'failed', 'info': 'Internal Server Error'}), 500
     QUESTIONS_UPDATED = dumps({'status': 'success', 'info': 'Questions Updated'}), 200
     PROFILE_UPDATED = dumps({'status': 'success', 'info': 'Profile Successfully Updated'}), 200
+    EMAIL_ALREADY_EXISTS = dumps({'status': 'failed', 'info': 'Email or Username Already Exists'}), 409
 
     @staticmethod
     def USER_LOGGED(user, token):
