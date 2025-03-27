@@ -212,12 +212,17 @@ onMounted(async () => {
                     </div>
                 </div>
 
-                <!-- clear option btn -->
+                <!-- clear option btn and correct option display -->
                 <button class="text-secondary link-underline-secondary clear-btn"
                 @click="clearOption(question.id)" :disabled="state.quizEnded"
-                :class="{'clear-btn-ended': state.quizEnded}">
+                v-if="!state.quizEnded">
                     Clear Option
                 </button>
+
+                <div v-else class="mt-3 fw-medium d-flex align-items-center">
+                    <span>Correct Option: </span>
+                    <span class="text-success fs-5 ms-2">{{ question.correct_option.toUpperCase() }}</span>
+                </div>
             </div>
         </div>
     </main>
@@ -283,7 +288,7 @@ input[type="radio"] {
 }
 
 input[type="radio"]:checked + .radio-label {
-    background-color: #198754;
+    background-color: #0d6efd;
     color: white;
 }
 
@@ -319,9 +324,5 @@ input[type="radio"]:checked + .radio-label {
     text-decoration: underline;
     display: inline-block;
     cursor: pointer;
-}
-.clear-btn-ended.clear-btn:hover {
-    text-decoration: none;
-    cursor: default;
 }
 </style>
