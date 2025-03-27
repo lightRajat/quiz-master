@@ -7,6 +7,14 @@ def get_admin_creds() -> dict:
         creds = json.load(f)
         return creds
 
+def update_admin_password(passwd: str) -> None:
+    creds = {
+        'username': 'admin',
+        'password': passwd,
+    }
+    with open('data/admin-creds.json', 'w') as f:
+        json.dump(creds, f, indent=4)
+
 def get_username_from_email(email: str) -> str:
     return email.split('@')[0]
 

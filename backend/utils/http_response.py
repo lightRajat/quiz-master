@@ -15,6 +15,7 @@ class Response:
     RESOURCE_UPDATED = dumps({'status': 'success', 'info': 'Resource Successfully Updated'}), 200
     INTERNAL_SERVER_ERROR = dumps({'status': 'failed', 'info': 'Internal Server Error'}), 500
     QUESTIONS_UPDATED = dumps({'status': 'success', 'info': 'Questions Updated'}), 200
+    PROFILE_UPDATED = dumps({'status': 'success', 'info': 'Profile Successfully Updated'}), 200
 
     @staticmethod
     def USER_LOGGED(user, token):

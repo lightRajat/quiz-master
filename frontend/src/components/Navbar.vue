@@ -59,7 +59,12 @@ const isLinkActive = (link) => {
 
                 <!-- dropdown -->
                 <ul class="dropdown-menu">
-                    <li><RouterLink class="dropdown-item" :to="editProfileLink">Edit Profile</RouterLink></li>
+                    <li>
+                        <button class="dropdown-item" data-bs-toggle="modal"
+                        :data-bs-target="`#${editProfileLink}`">
+                            Edit Profile
+                        </button>
+                    </li>
                     <li>
                         <button @click="logOut" class="dropdown-item text-danger">
                             <i class="bi bi-box-arrow-right me-1"></i>

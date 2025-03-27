@@ -40,7 +40,6 @@ def login():
     if email == admin_creds['username']:
         if password == admin_creds['password']:
             return Response.USER_LOGGED('admin', create_access_token(identity='admin'))
-
         else:
             return Response.INCORRECT_PASSWORD
     else:
@@ -78,6 +77,19 @@ def signup():
     
     return Response.USER_REGISTERED(user.username)
 
+@app.route('/admin-creds', methods=['GET', 'POST'])
+@jwt_required()
+def admin_creds():
+    token_user_id = get_jwt_identity()
+    if token_user_id != commons.get_admin_creds()['username']:
+        return Response.UNAUTHORIZED
+
+    if request.method == 'GET':
+        return Response.RESOURCE_FETCHED(commons.get_admin_creds())
+    else:
+        commons.update_admin_password(request.get_json()['password'])
+        return Response.PROFILE_UPDATED
+
 @app.route('/uploads/<string:path>')
 @jwt_required()
 def send_image_file(path: str):
@@ -85,11 +97,11 @@ def send_image_file(path: str):
 
     if token_user_id == commons.get_admin_creds()['username']:
         if path not in os.listdir(app.config['UPLOADS_FOLDER']):
-            return {'status': 'failed', 'info': "file not found"}, 404
+            return Response.RESOURCE_NOT_FOUND
     else:
         user = User.query.get(token_user_id)
         if user.profile_pic != path:
-            return {'status': 'failed', 'info': "not authorized"}, 403
+            return Response.UNAUTHORIZED
 
     return send_file(f"{app.config['UPLOADS_FOLDER']}/{path}")
 
