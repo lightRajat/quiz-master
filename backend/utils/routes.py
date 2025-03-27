@@ -321,7 +321,8 @@ class AttemptApi(Resource):
                 user_id = request.args.get('user_id')
                 if user_id:
                     # check auth
-                    if token_user_id != user_id:
+                    if token_user_id != int(user_id):
+                        print("unauth")
                         return Response.UNAUTHORIZED
                     else:
                         results = models.Attempt.query.filter_by(user_id=user_id).all()

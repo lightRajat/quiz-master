@@ -18,6 +18,7 @@ import AdminQuizView from '@/views/admin/QuizView.vue';
 import UserDashboard from '@/components/user/UserDashboard.vue';
 import UserQuizzesView from '@/views/user/QuizzesView.vue';
 import TakeAttemptView from '@/views/user/TakeAttemptView.vue';
+import UserAttemptsView from '@/views/user/AttemptsView.vue';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,6 +46,7 @@ const router = createRouter({
             children: [
                 {path: '/user/:user_id', name: 'user-quizzes', component: UserQuizzesView, meta: {title: "Quizzes"}},
                 {path: '/user/:user_id/quiz/:quiz_id/take', name: 'user-quiz-take', component: TakeAttemptView, meta: {title: "Quiz"}},
+                {path: '/user/:user_id/attempts', name: 'user-attempts', component: UserAttemptsView, meta: {title: "Quiz Attempts"}},
             ]
         },
         {path: '/:catchAll(.*)', name: 'not-found', component: NotFoundView, meta: {title: "404 Not Found"}},

@@ -50,7 +50,7 @@ api.interceptors.response.use((response) => {
     try {
       response.data = JSON.parse(response.data);
     } catch (error) {
-      console.error('Error parsing JSON response:', error);
+      
     }
   }
   return response;

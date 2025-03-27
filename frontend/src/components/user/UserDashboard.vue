@@ -7,7 +7,7 @@ import { api } from '@/utils/auth';
 
 const leftLinks = [
     { text: 'Quizzes', link: `/user/${getCurrentUser()}` },
-    { text: 'Attempts', link: '#' },
+    { text: 'Attempts', link: `/user/${getCurrentUser()}/attempts` },
 ];
 const editProfileLink = "#";
 const maxWidth = '940px';
