@@ -12,7 +12,7 @@ const leftLinks = [
     { text: 'Home', link: '/admin' },
     { text: 'Subjects', link: '/admin/subjects' },
     { text: 'Quizzes', link: '/admin/quizzes' },
-    { text: 'Attempts', link: '#' },
+    { text: 'Attempts', link: '/admin/attempts' },
     { text: 'Users', link: '#' },
 ];
 const maxWidth = '940px';
