@@ -8,6 +8,8 @@ const state = reactive({
     quizzes: [],
     subjects: [],
     chapters: [],
+    quizQuestions: [],
+    questions: [],
     chaptersInFilter: [],
     quizDisplay: null,
     isQuizDisplayEmpty: false,
@@ -83,6 +85,18 @@ const updateScopeNames = () => {
     });
 };
 
+const updateScores = () => {
+    state.quizzes.forEach((quiz) => {
+        const quizQuestions = state.quizQuestions.filter((item) => item.quiz_id == quiz.id);
+        let score = 0;
+        quizQuestions.forEach((question) => {
+            score += state.questions.find((item) => item.id === question.question_id).score;
+        });
+        quiz.score = score;
+    });
+    console.log(state.quizzes);
+};
+
 onMounted(async () => {
     try {
         // fetch subjects
@@ -102,6 +116,15 @@ onMounted(async () => {
         const quizDisplay = {};
         state.quizzes.forEach((quiz) => quizDisplay[quiz.id] = quiz.scope === 'subject');
         state.quizDisplay = quizDisplay;
+
+        // fetch questions
+        response = await api.get(`/questions`);
+        state.questions = response.data.data;
+
+        // fetch quiz questions
+        response = await api.get(`/quiz-questions`);
+        state.quizQuestions = response.data.data;
+        updateScores();
     } catch (error) {
         console.log(error.response?.data || error);
     }
@@ -166,6 +189,7 @@ onMounted(async () => {
                     <tr>
                         <th scope="col">#</th>
                         <th scope="col">Scope</th>
+                        <th scope="col">Score</th>
                         <th scope="col">Time</th>
                         <th scope="col">Description</th>
                         <th scope="col">Action</th>
@@ -188,6 +212,9 @@ onMounted(async () => {
                                 {{ row.scope === 'subject' ? row.subject_name : row.chapter_name }}
                             </h5>
                         </td>
+
+                        <!-- score -->
+                         <td>{{ row.score }} pts</td>
 
                         <!-- time -->
                         <td>
