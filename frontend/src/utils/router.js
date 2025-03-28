@@ -14,7 +14,8 @@ import AdminSubjectView from '@/views/admin/SubjectView.vue';
 import AdminQuizzesView from '@/views/admin/QuizzesView.vue';
 import AdminChapterView from '@/views/admin/ChapterView.vue';
 import AdminQuizView from '@/views/admin/QuizView.vue';
-import AdminAttemptsView from '@/views/admin/AttemptsView.vue'
+import AdminAttemptsView from '@/views/admin/AttemptsView.vue';
+import AdminStatsView from '@/views/admin/StatsView.vue';
 
 import UserDashboard from '@/components/user/UserDashboard.vue';
 import UserQuizzesView from '@/views/user/QuizzesView.vue';
@@ -42,6 +43,7 @@ const router = createRouter({
                 {path: '/admin/subject/:subject_id/:chapter_id', name: 'admin-chapter', component: AdminChapterView},
                 {path: '/admin/quizzes/:quiz_id', name: 'admin-quiz', component: AdminQuizView, meta: {title: "Edit Questions"}},
                 {path: '/admin/attempts', name: 'admin-attempts', component: AdminAttemptsView, meta: {title: "Quiz Attempts"}},
+                {path: '/admin/stats', name: 'admin-stats', component: AdminStatsView, meta: {title: "Statistics"}},
             ]
         },
         {
