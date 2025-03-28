@@ -126,7 +126,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="chart-container">
+    <div class="chart-container" v-if="state.attempts.length">
         <div class="pie-chart">
             <Pie :data="trueAnswerDist.data" ref="trueAnswerDistChart"
             :options="trueAnswerDist.options" v-if="trueAnswerDist.visible" />
@@ -137,6 +137,7 @@ onMounted(async () => {
             Download Chart as JPG
         </button>
     </div>
+    <h2 v-else class="m-5">Go attempt some quizzes to view stats here</h2>
 </template>
 
 <style scoped>

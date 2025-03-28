@@ -167,7 +167,7 @@ onMounted(async () => {
 
 <template>
     <main class="p-5">
-        <div class="d-flex align-items-end">
+        <div v-if="state.attempts.length" class="d-flex align-items-end">
 
             <!-- pie chart -->
             <div class="chart-container">
@@ -200,6 +200,8 @@ onMounted(async () => {
             </div>
 
         </div>
+
+        <h2 v-else>Stats will appear here after users start attempting quizzes</h2>
     </main>
 </template>
 
