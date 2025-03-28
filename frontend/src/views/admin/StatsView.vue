@@ -1,12 +1,12 @@
 <script setup>
-import { Pie } from "vue-chartjs";
-import { Chart as ChartJS, Title, Tooltip, ArcElement } from "chart.js";
+import { Pie, Bar } from "vue-chartjs";
+import { Chart as ChartJS, Title, Tooltip, ArcElement, BarElement, CategoryScale, LinearScale, Legend } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { reactive, onMounted, ref } from 'vue';
 import { api } from "@/utils/auth";
 
 // chartjs config
-ChartJS.register(Title, Tooltip, ArcElement, ChartDataLabels);
+ChartJS.register(Title, Tooltip, ArcElement, ChartDataLabels, BarElement, CategoryScale, LinearScale, Legend);
 
 ChartJS.defaults.font.family = "'Poppins', sans-serif";
 ChartJS.defaults.font.size = 16;
@@ -31,11 +31,11 @@ const state = reactive({
     scopeCount: {
         subject: 0,
         chapter: 0,
-        total: 0,
     },
+    dayAttemptedCount: [0, 0, 0, 0, 0, 0, 0],
 });
 
-const scopeDistPieChart = ref({
+const scopeDist = ref({
     visible: false,
     data: {
         labels: ["Subject", "Chapter"],
@@ -57,9 +57,43 @@ const scopeDistPieChart = ref({
             },
             datalabels: {
                 formatter: (value, context) => {
-                    return `${context.chart.data.labels[context.dataIndex]}\n${getPercentage(value, state.scopeCount.total)}%`;
+                    return `${context.chart.data.labels[context.dataIndex]}\n${getPercentage(value, state.attempts.length)}%`;
                 },
             },
+        },
+    },
+});
+
+const dayAttemptedDist = ref({
+    visible: false,
+    data: {
+        labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"],
+        datasets: [{
+            label: "100",
+            data: [10, 20, 30, 40, 50, 60, 70],
+            backgroundColor: ["#3385FF", "#3385FF", "#3385FF", "#3385FF", "#3385FF", "#3385FF", "#3385FF"],
+        }],
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                    boxWidth: 0,
+                }
+            },
+            title: {
+                display: true,
+                text: 'Quiz Attempts Across Week Days',
+                align: "center",
+                padding: { bottom: 10 },
+            },
+        },
+        scales: {
+            x: { grid: { display: false } },
+            y: { grid: { display: false } },
         },
     },
 });
@@ -74,7 +108,6 @@ onMounted(async () => {
         let response = await api.get('/attempts');
         state.attempts = response.data.data;
 
-        // fetch scopes
         for (const attempt of state.attempts) {
             response = await api.get(`/quiz/${attempt.quiz_id}`);
             attempt.scope = response.data.data.scope;
@@ -86,11 +119,20 @@ onMounted(async () => {
                 state.scopeCount.chapter++;
             }
             state.scopeCount.total++;
+
+            // count day attempted for week days
+            const dayNum = new Date(attempt.date_attempted).getDay();
+            state.dayAttemptedCount[dayNum]++;
         }
         
         // update scope counts in pie chart
-        scopeDistPieChart.value.data.datasets[0].data = [state.scopeCount.subject, state.scopeCount.chapter];
-        scopeDistPieChart.value.visible = true;
+        scopeDist.value.data.datasets[0].data = [state.scopeCount.subject, state.scopeCount.chapter];
+        scopeDist.value.visible = true;
+
+        // update dayAttempted counts in bar graph
+        dayAttemptedDist.value.data.datasets[0].data = state.dayAttemptedCount;
+        dayAttemptedDist.value.data.datasets[0].label = `Total: ${state.attempts.length}`;
+        dayAttemptedDist.value.visible = true;
     } catch (error) {
         console.log(error.response?.data || error);
     }
@@ -99,7 +141,25 @@ onMounted(async () => {
 
 <template>
     <main class="p-5">
-        <Pie :data="scopeDistPieChart.data" :options="scopeDistPieChart.options"
-        v-if="scopeDistPieChart.visible" />
+        <div class="d-flex align-items-center">
+
+            <div class="chart-container">
+                <Pie :data="scopeDist.data" :options="scopeDist.options"
+                v-if="scopeDist.visible" />
+            </div>
+
+            <div class="chart-container">
+                <Bar :data="dayAttemptedDist.data" :options="dayAttemptedDist.options"
+                v-if="dayAttemptedDist.visible" />
+            </div>
+
+        </div>
     </main>
 </template>
+
+<style scoped>
+.chart-container {
+    width: 50%;
+    padding: 16px;
+}
+</style>
