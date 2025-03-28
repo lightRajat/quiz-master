@@ -44,14 +44,21 @@ const downloadData = () => {
     }
     const csvString = csvContents.join('\n');
     
-    // make the download through anchor tag
+    // creating blob and url
+    const csvBlob = new Blob([csvString], {type: 'text/csv'});
+    const csvUrl = URL.createObjectURL(csvBlob);
+
+    // making download through anchor tag
     const anchorElem = document.createElement('a');
-    anchorElem.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvString));
-    anchorElem.setAttribute('download', 'userAttemptsData.csv');
+    anchorElem.href = csvUrl;
+    anchorElem.download = 'userAttemptsData.csv';
     anchorElem.style.display = 'none';
     document.body.appendChild(anchorElem);
     anchorElem.click();
+
+    // cleanup
     document.body.removeChild(anchorElem);
+    URL.revokeObjectURL(csvUrl);
 };
 
 onMounted(async () => {

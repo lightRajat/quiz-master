@@ -17,14 +17,21 @@ const downloadData = () => {
     }
     const csvString = csvContents.join('\n');
     
-    // make the download through anchor tag
+    // creating blob and url
+    const csvBlob = new Blob([csvString], {type: 'text/csv'});
+    const csvUrl = URL.createObjectURL(csvBlob);
+
+    // making download through anchor tag
     const anchorElem = document.createElement('a');
-    anchorElem.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvString));
-    anchorElem.setAttribute('download', 'quizAttemptsData.csv');
+    anchorElem.href = csvUrl;
+    anchorElem.download = 'quizAttemptsData.csv';
     anchorElem.style.display = 'none';
     document.body.appendChild(anchorElem);
     anchorElem.click();
+
+    // cleanup
     document.body.removeChild(anchorElem);
+    URL.revokeObjectURL(csvUrl);
 };
 
 const updateScopeNames = async () => {
