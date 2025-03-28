@@ -11,6 +11,7 @@ const state = reactive({
     leftLinks: [
         { text: 'Quizzes', link: `/user/${getCurrentUser()}` },
         { text: 'Past Quizzes', link: `/user/${getCurrentUser()}/attempts` },
+        { text: 'Stats', link: `/user/${getCurrentUser()}/stats` },
     ],
     maxWidth: '940px',
     user: {},

@@ -53,7 +53,7 @@ const scopeDist = ref({
             },
             datalabels: {
                 formatter: (value, context) => {
-                    return `${context.chart.data.labels[context.dataIndex]}\n${getPercentage(value, state.attempts.length)}%`;
+                    return `${context.chart.data.labels[context.dataIndex]}\n${getPercentage(value, state.attempts.length)}% (${value})`;
                 },
             },
         },
@@ -179,7 +179,7 @@ onMounted(async () => {
 
                 <button class="btn btn-primary mt-4" @click="downloadChart('pie')">
                     <i class="bi bi-download me-1"></i>
-                    Download Chart as PNG
+                    Download Chart as JPG
                 </button>
 
             </div>
@@ -194,7 +194,7 @@ onMounted(async () => {
 
                 <button class="btn btn-primary mt-4" @click="downloadChart('bar')">
                     <i class="bi bi-download me-1"></i>
-                    Download Chart as PNG
+                    Download Chart as JPG
                 </button>
 
             </div>
