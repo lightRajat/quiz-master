@@ -1,20 +1,19 @@
 <script setup>
 import { api, getCurrentUser } from '@/utils/auth';
 import { onMounted, reactive, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter, RouterLink } from 'vue-router';
 
 const route = useRoute();
+const router = useRouter();
 
 const state = reactive({
     quiz: {},
     questions: [],
     selected_options: {},
-    countDown: 3,
     timeLeft: null,
     quizStarted: false,
     quizEnded: false,
     timerId: null,
-    startDisplayingQuestions: false,
     attempt: {},
 });
 
@@ -29,27 +28,42 @@ const clearOption = (question_id) => {
     state.selected_options[question_id] = '';
 };
 
+const startQuiz = () => {
+    state.quizStarted = true;
+    state.timerId = setInterval(() => {
+        state.timeLeft -= 1;
+
+        if (state.timeLeft <= 0) {
+            endQuiz();
+        }
+    }, 1000);
+};
+
 const endQuiz = async () => {
     clearInterval(state.timerId);
     state.quizEnded = true;
     
     // prepare data to send to Attempt
-    let score = 0;
-    let totalScore = 0;
+    state.quiz.time_taken = state.quiz.time - parseInt(state.timeLeft / 60);
+
+    state.quiz.score = 0;
     state.questions.forEach((question) => {
-        totalScore += question.score;
         if (state.selected_options[question.id] == question.correct_option) {
-            score += question.score;
+            state.quiz.score += question.score;
         }
     });
 
+    // show closing modal
+    document.getElementById('modal').click();
+
+    // prepare form
     const attemptData = new FormData();
     attemptData.set('user_id', getCurrentUser());
     attemptData.set('quiz_id', state.quiz.id);
     attemptData.set('total_time', state.quiz.time);
-    attemptData.set('time_taken', state.quiz.time - parseInt(state.timeLeft / 60));
-    attemptData.set('total_score', totalScore);
-    attemptData.set('score', score);
+    attemptData.set('time_taken', state.quiz.time_taken);
+    attemptData.set('total_score', state.quiz.total_score);
+    attemptData.set('score', state.quiz.score);
 
     // send attempt data to server
     try {
@@ -86,6 +100,10 @@ const endQuiz = async () => {
     }
 };
 
+const goBack = () => {
+    router.push(`/user/${getCurrentUser()}`);
+};
+
 onMounted(async () => {
     try {
         // fetch quiz id
@@ -104,6 +122,7 @@ onMounted(async () => {
         }
         response = await api.get(`/subject/${state.quiz.subject_id}`);
         state.quiz.subject_name = response.data.data.name;
+        state.quiz.total_score = 0;
         
         // fetch question ids of quiz
         response = await api.get(`/quiz-questions?quiz_id=${state.quiz.id}`);
@@ -116,52 +135,167 @@ onMounted(async () => {
             state.questions[i] = response.data.data;
             
             // add selected_options data
-            state.selected_options[state.questions[i].id] = 'b';
+            state.selected_options[state.questions[i].id] = '';
+
+            // add score to total score
+            state.quiz.total_score += response.data.data.score;
         }
 
     } catch (error) {
         console.log(error.response?.data || error);
     }
 
+    // show welcome modal
+    document.getElementById('modal').click();
+
     // set quiz timeLeft
     state.timeLeft = state.quiz.time * 60;
-
-    // start countdown timer
-    state.startDisplayingQuestions = true;
-    state.timerId = setInterval(() => {
-        state.countDown -= 1;
-
-        if (state.countDown <= 0) {
-            clearInterval(state.timerId);
-            state.quizStarted = true;
-            state.timerId = setInterval(() => {
-                state.timeLeft -= 1;
-
-                if (state.timeLeft <= 0) {
-                    endQuiz();
-                }
-            }, 1000);
-        }
-    }, 1000);
 });
 </script>
 
 <template>
+    <!-- modal panel -->
+
+    <!-- button -->
+    <button type="button" data-bs-toggle="modal" data-bs-target="#exampleModal"
+    id="modal" style="display: none;"></button>
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            
+            <!-- header -->
+            <div class="modal-header p-3">
+
+                <!-- welcome title -->
+                <div v-if="!state.quizEnded" class="d-flex flex-column">
+                    <div v-if="state.quiz.scope === 'chapter'" class="mb-0 modal-subheading text-secondary">
+                        {{ state.quiz.subject_name }}
+                    </div>
+                    <div class="fs-5 modal-heading">
+                        {{ state.quiz.scope === 'chapter' ? state.quiz.chapter_name : state.quiz.subject_name }}
+                        Quiz
+                    </div>
+                </div>
+                <!-- closing title -->
+                <div v-else>
+                    <h3>Quiz Ended</h3>
+                </div>
+
+                <!-- close button -->
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+
+            <!-- body  -->
+            <div class="modal-body">
+
+                <!-- welcome body -->
+                <div v-if="!state.quizEnded">
+
+                    <!-- description -->
+                    <h6 class="mb-0">Description:</h6>
+                    <p class="mb-1">{{ state.quiz.description }}</p>
+
+                    <!-- time -->
+                    <div class="d-flex align-items-center mb-1">
+                        <h6 class="mb-0 me-2">Total Time:</h6>
+                        <p class="mb-0">{{ state.quiz.time }} mins</p>
+                    </div>
+
+                    <!-- score -->
+                    <div class="d-flex align-items-center">
+                        <h6 class="mb-0 me-2">Total Score:</h6>
+                        <p class="mb-0">{{ state.quiz.total_score }} pts</p>
+                    </div>
+
+                    <!-- quiz instructions -->
+                    <h6 class="mb-0 mt-3">Instructions:</h6>
+                    <p>Once you start the quiz, the questions will appear and the
+                        timer will start on the upper right corner. The quiz will end
+                        when either the time runs out or you click the submit button</p>
+
+                </div>
+                <!-- closing body -->
+                <div v-else>
+
+                    <!-- score obtained -->
+                    <div class="d-flex align-items-center">
+                        <h6 class="mb-0 me-2">Score Obtained:</h6>
+                        <p class="mb-0">
+                            <span class="score">{{ state.quiz.score }}</span>
+                            /<span class="total-score">{{ state.quiz.total_score }}</span> pts
+                        </p>
+                    </div>
+
+                    <!-- time taken -->
+                    <div class="d-flex align-items-center mb-2">
+                        <h6 class="mb-0 me-2">Time Taken:</h6>
+                        <p class="mb-0">
+                            <span class="score">{{ state.quiz.time_taken }}</span>
+                            /<span class="total-score">{{ state.quiz.time }}</span> mins
+                        </p>
+                    </div>
+
+                    <!-- instruction -->
+                    <p>The quiz has ended. You can now view the correct options
+                        to all the questions. Quiz details are also now available
+                        on the <em>Past Attempts</em> Page</p>
+
+                </div>
+
+            </div>
+
+            <!-- footer -->
+            <div class="modal-footer">
+
+                <!-- welcome footer -->
+                <div v-if="!state.quizEnded">
+
+                    <button type="button" class="btn btn-outline-secondary me-3"
+                    data-bs-dismiss="modal" @click="goBack">
+                        Go Back
+                    </button>
+
+                    <button type="button" class="btn btn-primary" @click="startQuiz"
+                    data-bs-dismiss="modal">
+                        Start Quiz
+                    </button>
+
+                </div>
+                <!-- closing footer -->
+                <div v-else>
+                    <button type="button" class="btn btn-primary"
+                    data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+                
+            </div>
+
+        </div>
+    </div>
+    </div>
+
+    <!-- page content -->
     <main class="container mt-4">
         <!-- heading -->
-        <div class="mb-5">
-            <h2 v-if="state.quiz.scope === 'chapter'" class="lead mb-0 ms-1">
-                {{ state.quiz.subject_name }}
-            </h2>
-            <h1 class="display-5">
-                {{ state.quiz.scope === 'chapter' ? state.quiz.chapter_name : state.quiz.subject_name }}
-            </h1>
+        <div class="mb-5 d-flex align-items-end">
+            <RouterLink v-if="state.quizEnded" :to="`/user/${getCurrentUser()}`" class="h3 mb-3 me-3"><i class="bi bi-arrow-left-circle me-3"></i></RouterLink>
+            <div>
+                <h2 v-if="state.quiz.scope === 'chapter'" class="lead mb-0 ms-1">
+                    {{ state.quiz.subject_name }}
+                </h2>
+                <h1 class="display-5">
+                    {{ state.quiz.scope === 'chapter' ? state.quiz.chapter_name : state.quiz.subject_name }}
+                    Quiz
+                </h1>
+            </div>
         </div>
 
         <!-- questions -->
         <div v-for="(question, index) in state.questions" :key="index" class="card mb-5 question"
-        :class="state.startDisplayingQuestions ? 'question-visible' : ''"
-        :style="`transition: ${state.countDown + 1}s;`">
+        :class="state.quizStarted ? 'question-visible' : ''">
             <div class="card-body p-4">
                 <!-- question -->
                 <p class="h5 mb-3 d-flex justify-content-between">
@@ -228,8 +362,8 @@ onMounted(async () => {
     </main>
 
     <!-- menu -->
-    <div class="menu bg-success-subtle" :class="{'menu-later': state.quizStarted}">
-        <p class="timer" :class="state.quizStarted ? 'timer-hidden' : ''">will start in {{ state.countDown }} seconds</p>
+    <div class="menu bg-success-subtle" :class="{'menu-later': state.quizStarted}"
+    v-show="!state.quizEnded">
         <p class="fs-4 mb-2">{{ minLeft }}:{{ secLeft }}</p>
         <button class="btn btn-success" :disabled="!state.quizStarted || state.quizEnded"
         @click="endQuiz">
@@ -244,6 +378,7 @@ onMounted(async () => {
 }
 .question-visible {
     opacity: 1;
+    transition: 1s;
 }
 
 .timer {
@@ -324,5 +459,21 @@ input[type="radio"]:checked + .radio-label {
     text-decoration: underline;
     display: inline-block;
     cursor: pointer;
+}
+
+.modal-subheading {
+    font-size: small;
+    margin-left: 1px;
+}
+.modal-heading {
+    line-height: normal;
+}
+
+
+.total-score {
+    font-size: 12px;
+}
+.score {
+    font-size: 22px;
 }
 </style>

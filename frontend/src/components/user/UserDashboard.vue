@@ -1,18 +1,25 @@
 <script setup>
 import Navbar from '@/components/Navbar.vue';
-import { RouterView } from 'vue-router';
+import { RouterView, useRoute } from 'vue-router';
 import { getCurrentUser } from '@/utils/auth';
-import { onMounted, reactive } from 'vue';
+import { onMounted, reactive, computed } from 'vue';
 import { api } from '@/utils/auth';
+
+const route = useRoute();
 
 const state = reactive({
     leftLinks: [
         { text: 'Quizzes', link: `/user/${getCurrentUser()}` },
-        { text: 'Attempts', link: `/user/${getCurrentUser()}/attempts` },
+        { text: 'Past Quizzes', link: `/user/${getCurrentUser()}/attempts` },
     ],
     maxWidth: '940px',
     user: {},
     profilePicUrl: '',
+});
+
+const isPageTakeQuiz = computed(() => {
+    const pathSplit = route.path.split('/');
+    return pathSplit[pathSplit.length - 1] === 'take';
 });
 
 const updateProfile = async () => {
@@ -55,7 +62,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <Navbar :leftLinks="state.leftLinks" editProfileLink="edit-profile-menu"
+    <Navbar v-show="!isPageTakeQuiz" :leftLinks="state.leftLinks" editProfileLink="edit-profile-menu"
     :maxWidth="state.maxWidth" :user-name="state.user.username" :profile-pic-url="state.profilePicUrl" />
     <RouterView />
 
