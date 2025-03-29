@@ -2,6 +2,16 @@ from utils.imports import *
 
 app = Flask(__name__)
 
+# Mail
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'light.rajat+test@gmail.com'
+app.config['MAIL_DEFAULT_SENDER'] = 'light.rajat+test@gmail.com'
+app.config['MAIL_PASSWORD'] = 'qcyhijqqzyetesvh'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+mail.init_app(app)
+
 # Database
 db_path = os.path.join(os.getcwd(), 'data/data.db')
 app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'

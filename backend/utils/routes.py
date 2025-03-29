@@ -204,6 +204,10 @@ class QuizQuestionApi(Resource):
             quiz_question = models.QuizQuestion(quiz_id=data['quiz_id'], question_id=question_id)
             models.db.session.add(quiz_question)
         models.db.session.commit()
+
+        # send email reminders
+        from utils.tasks import send_email_reminders
+        send_email_reminders(data['quiz_id'])
         
         return Response.QUESTIONS_UPDATED
 
