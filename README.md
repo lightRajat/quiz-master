@@ -2,6 +2,33 @@
 
 It is a multi-user app (one requires an administrator and other users) that acts as an exam preparation site for multiple courses.
 
+## Technologies Used
+
+1. `Vue` : as the frontend framework
+2. `Flask` : as the backend server
+3. `Sqlite` : as the database storage
+4. `Bootstrap` : for styling the frontend
+
+## Install Dependencies
+
+### Backend
+
+To install the required dependencies, run these commands
+
+```bash
+cd backend
+pip install -r requirements.txt
+```
+
+### Frontend
+
+To setup node and install required dependencies, run below commands
+
+```bash
+cd frontend
+npm install
+```
+
 ## Start Backend Server
 
 Start a terminal session and go into the *backend/* folder first— `cd backend`
@@ -43,7 +70,6 @@ You can also run `./reinit-server.sh` to run the above 3 commands together which
 1. Start a new terminal session and go into the *frontend/* folder first— `cd frontend`
 2. Then run `npm run dev` to start the `Vue.js` client.
 3. Open the port on your localhost mentioned in the terminal by running the above command.
-Got it! Let's follow that specific format for the Subjects API documentation.
 
 ## API Documentation
 
