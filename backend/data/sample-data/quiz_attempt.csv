@@ -1,0 +1,6 @@
+user_name,quiz_id,date_attempted,time_taken,score
+johndoe,1,2024-03-10,25,8
+janesmith,2,2024-03-10,30,9
+aliceb,3,2024-03-11,18,7
+bobj,4,2024-03-11,20,10
+charliel,5,2024-03-12,30,6

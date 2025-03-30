@@ -1,0 +1,26 @@
+subject_name,name,description
+Mathematics,Algebra,"Covers equations, inequalities, and polynomials."
+Mathematics,Calculus,Differentiation and integration concepts.
+Mathematics,Geometry,
+Mathematics,Trigonometry,Study of angles and trigonometric functions.
+Mathematics,Probability,
+Physics,Mechanics,"Newton's laws, motion, and forces."
+Physics,Thermodynamics,"Heat, energy, and the laws of thermodynamics."
+Physics,Electromagnetism,
+Physics,Optics,Study of light and its behavior.
+Physics,Quantum Physics,
+Chemistry,Organic Chemistry,Study of carbon-based compounds.
+Chemistry,Inorganic Chemistry,"Study of metals, minerals, and non-carbon compounds."
+Chemistry,Physical Chemistry,
+Chemistry,Biochemistry,Chemical processes in living organisms.
+Chemistry,Analytical Chemistry,
+Computer Science,Programming Basics,Introduction to programming languages.
+Computer Science,Data Structures,"Arrays, linked lists, stacks, and queues."
+Computer Science,Algorithms,
+Computer Science,Databases,SQL and NoSQL database concepts.
+Computer Science,Operating Systems,
+History,Ancient Civilizations,Study of early human societies.
+History,Medieval History,Middle Ages and feudal systems.
+History,Modern History,
+History,World Wars,Causes and effects of WWI and WWII.
+History,Indian Independence,

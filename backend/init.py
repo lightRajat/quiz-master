@@ -6,6 +6,12 @@ from utils.commons import get_date_from_string
 from getpass import getpass
 import json
 
+def create_required_files():
+    os.mkdir('data/profile-pics')
+    admin_creds = {"username": "admin", "password": "admin"}
+    with open('data/admin-creds.json', 'w') as f:
+        f.write(json.dumps(admin_creds))
+
 def initialize_database():
     with app.app_context():
         db.create_all()
@@ -203,6 +209,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
+create_required_files
 initialize_database()
 add_sample_data()
 add_mail_creds()

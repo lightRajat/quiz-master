@@ -1,0 +1,46 @@
+id,chapter_name,question,option_a,option_b,option_c,option_d,correct_option,score
+1,Algebra,"Solve for x: 2x + 5 = 11","x = 6","x = 3","x = 4","x = 2",b,3
+2,Algebra,"Simplify: (a+b)^2","a^2 + b^2","a^2 + 2ab + b^2","2ab + b^2","a^2 + 2b",b,2
+3,Algebra,"Is x^2 + 1 = 0 solvable in real numbers?","False","True",,,a,1
+4,Algebra,"Factor: x^2 - 4","(x-4)(x+1)","(x-2)(x+2)","(x+4)(x-1)","(x-2)(x-2)",b,4
+5,Algebra,"Solve the inequality: 3x - 2 < 7","x > 3","x < 3","x >= 3","x <= 3",b,5
+6,Calculus,"What is the derivative of x^2?","x^3/3","2x","x","2",b,2
+7,Calculus,"What is the integral of 1/x?","e^x","ln|x|","x","1/x^2",b,3
+8,Calculus,"Is the derivative of a constant zero?","True","False",,,a,1
+9,Calculus,"Find the limit of sin(x)/x as x approaches 0.","0","1","infinity","-1",b,4
+10,Calculus,"What is the chain rule used for?","Simple functions","Composite functions","Addition of functions","Multiplication of functions",b,5
+11,Geometry,"What is the area of a circle with radius 5?","10π","25π","5π","100π",b,2
+12,Geometry,"What is the Pythagorean theorem?","a + b = c","a^2 + b^2 = c^2","a^2 - b^2 = c^2","a + b = c^2",b,3
+13,Geometry,"Is the sum of angles in a triangle 180 degrees?","True","False",,,a,1
+14,Geometry,"What is the volume of a cube with side length 3?","9","27","81","6",b,4
+15,Geometry,"What is the formula for the circumference of a circle?","πr^2","2πr","πr","r^2",b,5
+16,Trigonometry,"What is sin(π/2)?","0","1","-1","0.5",b,2
+17,Trigonometry,"What is cos(0)?","0","1","-1","0.707",b,3
+18,Trigonometry,"Is tan(π/4) equal to 1?","True","False",,,a,1
+19,Trigonometry,"What is the value of sin^2(x) + cos^2(x)?","0","1","2","-1",b,4
+20,Trigonometry,"What is the reciprocal of cosine?","cosecant","secant","cotangent","tangent",b,5
+21,Probability,"What is the probability of rolling a 6 on a fair die?","1/2","1/6","1/3","1/4",b,2
+22,Probability,"What is the probability of flipping heads on a fair coin?","1/4","1/2","1/3","1/5",b,3
+23,Probability,"Is the probability of an impossible event 0?","True","False",,,a,1
+24,Probability,"What is the probability of drawing a red card from a standard deck?","1/4","1/2","1/3","1/52",b,4
+25,Probability,"What is the probability of two independent events both occurring?","Sum of their probabilities","Product of their probabilities","Difference of their probabilities","Ratio of their probabilities",b,5
+26,Mechanics,"What is Newton's first law?","Acceleration","Inertia","Force","Momentum",b,2
+27,Mechanics,"What is the formula for force?","F = mv","F = ma","F = v/t","F = m/v",b,3
+28,Mechanics,"Is acceleration the rate of change of velocity?","True","False",,,a,1
+29,Mechanics,"What is the unit of force?","Joule","Newton","Watt","Pascal",b,4
+30,Mechanics,"What is the formula for kinetic energy?","mv","1/2 mv^2","mv^2","1/2 mv",b,5
+31,Organic Chemistry,"What is the main element in organic compounds?","Oxygen","Carbon","Nitrogen","Sulfur",b,2
+32,Organic Chemistry,"Are hydrocarbons composed of hydrogen and carbon?","True","False",,,a,3
+33,Organic Chemistry,"What is the functional group in alcohols?","COOH","OH","CHO","NH2",b,1
+34,Organic Chemistry,"What is the process of breaking down large molecules into smaller ones?","Polymerization","Hydrolysis","Condensation","Oxidation",b,4
+35,Organic Chemistry,"What are alkanes?","Unsaturated hydrocarbons","Saturated hydrocarbons","Aromatic compounds","Alcohols",b,5
+36,Programming Basics,"What is a variable?","Function","Storage location","Loop","Conditional",b,2
+37,Programming Basics,"Is Python a compiled language?","False","True",,,a,3
+38,Programming Basics,"What is a loop?","Conditional statement","Repeating a block of code","Function","Variable",b,1
+39,Programming Basics,"What is a function?","Variable","Reusable block of code","Array","Loop",b,4
+40,Programming Basics,"What is an array?","Single element","Collection of elements","Function","Variable",b,5
+41,Ancient Civilizations,"Which civilization built the pyramids of Giza?","Roman","Egyptian","Greek","Persian",b,2
+42,Ancient Civilizations,"Was the Indus Valley Civilization known for its urban planning?","True","False",,,a,3
+43,Ancient Civilizations,"Who was the first emperor of China?","Confucius","Qin Shi Huang","Ashoka","Alexander",b,1
+44,Ancient Civilizations,"What was the primary writing system of Mesopotamia?","Hieroglyphics","Cuneiform","Alphabet","Pictographs",b,4
+45,Ancient Civilizations,"Which ancient civilization developed the concept of democracy?","Persian","Greek","Roman","Egyptian",b,5

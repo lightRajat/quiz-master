@@ -1,0 +1,6 @@
+id,scope,chapter_name,subject_name,time,description
+1,subject,,Mathematics,30,"Mathematics quiz covering Algebra and Calculus"
+2,subject,,Physics,45,"Physics quiz on Mechanics and Thermodynamics"
+3,chapter,Mechanics,Physics,20,"Mechanics chapter quiz on Newton's laws"
+4,chapter,Organic Chemistry,Chemistry,25,"Organic chemistry quiz on functional groups"
+5,chapter,Programming Basics,Computer Science,35,"Programming basics quiz on variables and loops"

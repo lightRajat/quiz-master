@@ -1,0 +1,6 @@
+name,email,username,password,date_joined,profile_pic,date_account_deleted,qualification,dob
+John Doe,alphadnu+test@gmail.com,johndoe,johndoe,2024-03-01,1.jpg,,B.Tech,
+Jane Smith,minudnoc2+test@gmail.com,janesmith,janesmith,2024-03-02,,,M.Sc,
+Alice Brown,24f1002405+test@ds.study.iitm.ac.in,aliceb,aliceb,2024-03-03,3.png,2025-01-01,,1995-12-10
+Bob Johnson,jason.blackwood.horror+test@gmail.com,bobj,bobj,2024-03-04,,,,2002-07-05
+Charlie Lee,periv88921@motivue.com,charliel,charliel,2024-03-05,5.jpg,,M.Tech,1999-03-25

@@ -1,5 +1,8 @@
 **/__pycache__/
-backend/data/
+backend/data/data.db
+backend/data/mail-creds.json
+backend/data/admin-creds.json
+backend/data/profile-pics/
 **/.vscode/
 frontend/node_modules
 frontend/package-lock.json
