@@ -209,7 +209,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
-create_required_files
+create_required_files()
 initialize_database()
 add_sample_data()
 add_mail_creds()
