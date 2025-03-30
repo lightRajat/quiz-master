@@ -28,9 +28,7 @@ const editData = async (id) => {
         try {
             const { editable: value, ...dataToSend } = question;
             dataToSend.correct_option = dataToSend.correct_option.toLowerCase();
-            console.log(question);
             const response = await api.put(`/question/${id}`, dataToSend);
-            console.log(response.data);
             window.showToast("Question Successfully Updated", 'success');
         } catch (error) {
             console.log(error.response?.data || error);

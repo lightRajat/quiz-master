@@ -5,9 +5,10 @@ app = Flask(__name__)
 # Mail
 app.config['MAIL_SERVER']='smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = 'light.rajat+test@gmail.com'
-app.config['MAIL_DEFAULT_SENDER'] = 'light.rajat+test@gmail.com'
-app.config['MAIL_PASSWORD'] = 'qcyhijqqzyetesvh'
+mail_creds = commons.get_mail_creds()
+app.config['MAIL_USERNAME'] = mail_creds['email']
+app.config['MAIL_DEFAULT_SENDER'] = mail_creds['email']
+app.config['MAIL_PASSWORD'] = mail_creds['password']
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 mail.init_app(app)

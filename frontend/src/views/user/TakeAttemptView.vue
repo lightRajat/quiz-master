@@ -89,12 +89,10 @@ const endQuiz = async () => {
             'correct_answer': correctAnswer,
         });
     });
-    console.log(attemptQuestionsData)
     
     // send AttemptQuestion data to server
     try {
         const response = await api.post('/attempt-questions', attemptQuestionsData);
-        console.log(response.data);
     } catch (error) {
         console.log(error.response?.data || error);
     }
@@ -298,7 +296,7 @@ onMounted(async () => {
         :class="state.quizStarted ? 'question-visible' : ''">
             <div class="card-body p-4">
                 <!-- question -->
-                <p class="h5 mb-3 d-flex justify-content-between">
+                <div class="h5 mb-3 d-flex justify-content-between">
                     <div>
                         <span class="me-3">{{ index + 1 }}.</span>
                         <span>{{ question.question }}</span>
@@ -306,7 +304,7 @@ onMounted(async () => {
 
                     <!-- marks -->
                      <div class="text-secondary me-2 fs-6">{{ question.score }} marks</div>
-                </p>
+                </div>
                 
                 <!-- options -->
                 <div class="option-grp container mb-2">

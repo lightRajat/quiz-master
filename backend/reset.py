@@ -19,4 +19,7 @@ creds = '''{\n\t"username": "admin",\n\t"password": "admin"\n}'''
 with open("data/admin-creds.json", 'w') as f:
     f.write(creds)
 
-print("Project reset!")
+# remove mail creds
+os.remove('data/mail-creds.json')
+
+print("Project reset!\n\n")

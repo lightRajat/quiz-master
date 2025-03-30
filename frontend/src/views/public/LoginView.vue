@@ -4,8 +4,8 @@ import { reactive } from 'vue';
 import { loginUser } from '@/utils/auth';
 
 const state = reactive({
-    email: 'johndoe',
-    password: 'johndoe'
+    email: '',
+    password: ''
 });
 const router = useRouter();
 

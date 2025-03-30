@@ -77,10 +77,15 @@ onMounted(async () => {
 <template>
     <div class="m-5">
         <Card heading="Quiz Attempts by Users">
-            <button @click="downloadData" class="btn btn-primary download-btn">
+
+            <!-- download button -->
+            <button @click="downloadData" class="btn btn-primary download-btn"
+            :disabled="!state.attempts.length">
                 <i class="bi bi-download me-1"></i>
                 Download Data as CSV
             </button>
+
+            <!-- table -->
             <table class="table table-striped table-hover align-middle">
                 <thead>
                     <tr>

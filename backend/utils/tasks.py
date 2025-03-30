@@ -12,7 +12,7 @@ def send_async_email_reminders(flask_app_instance, mail_data: dict):
                 scope_text = f"the subject {mail_data['subject_name']}"
             else:
                 scope_text = f"{mail_data['chapter_name']} from {mail_data['subject_name']}"
-            mail_body = f"Hi {user[0]}\n\nWe just released a new quiz on {scope_text}.\n\nGo check it out now and see if you can get it all right."
+            mail_body = f"Hi {user[0]}\n\nWe just released a new quiz on {scope_text}.\n\nGo check it out now and see if you can get it all right.\n\nRegards\nQuiz Master"
 
             msg = Message(mail_subject, recipients=[user[1]], body=mail_body)
             mail.send(msg)

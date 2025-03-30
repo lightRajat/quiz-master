@@ -3,6 +3,8 @@ from utils.models import *
 import csv
 import os, shutil
 from utils.commons import get_date_from_string
+from getpass import getpass
+import json
 
 def initialize_database():
     with app.app_context():
@@ -182,11 +184,17 @@ def add_sample_binaries():
 
         shutil.copy(src_path, dest_path)
 
+def add_mail_creds():
+    email = input("Mail Username: ")
+    password = getpass("Enter Password: ")
+    mail_creds = {"email": email, "password": password}
 
+    with open("data/mail-creds.json", "w") as f:
+        f.write(json.dumps(mail_creds))
 
 # check if already initialized
 if os.path.exists('data/data.db'):
-    print("Project already initialized")
+    print("Project already initialized\nGo run server.py now\n\n")
     exit(0)
 
 app = Flask(__name__)
@@ -197,5 +205,6 @@ db.init_app(app)
 
 initialize_database()
 add_sample_data()
+add_mail_creds()
 
-print("Project initialized!")
+print("Project initialized!\nRun server.py now\n\n")

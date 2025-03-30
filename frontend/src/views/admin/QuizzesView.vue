@@ -98,7 +98,7 @@ onMounted(async () => {
 
         // fetch quizzes
         response = await api.get('/quizzes');
-        state.quizzes = response.data.data;
+        state.quizzes = response.data.data.reverse();
         state.quizzes.forEach((item) => item.editable = false);
         updateScopeNames();
     } catch (error) {

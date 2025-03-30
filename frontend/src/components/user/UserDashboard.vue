@@ -40,6 +40,8 @@ const updateProfile = async () => {
 };
 
 const fetchProfilePic = async () => {
+    if (!state.user.profile_pic) return;
+    
     const response = await api.get(state.user.profile_pic, {
         responseType: 'blob',
     });

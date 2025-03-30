@@ -18,7 +18,7 @@ const state = reactive({
 const filter = reactive({
     subject_id: '',
     chapter_id: '',
-    quizType: 'subject',
+    quizType: 'chapter',
 });
 
 // filter quizzes
@@ -68,7 +68,7 @@ watch(filter, () => {
 const resetFilter = () => {
     filter.subject_id = '';
     filter.chapter_id = '';
-    filter.quizType = 'subject';
+    filter.quizType = 'chapter';
 };
 
 const updateScopeNames = () => {
@@ -88,13 +88,16 @@ const updateScopeNames = () => {
 const updateScores = () => {
     state.quizzes.forEach((quiz) => {
         const quizQuestions = state.quizQuestions.filter((item) => item.quiz_id == quiz.id);
+
         let score = 0;
         quizQuestions.forEach((question) => {
             score += state.questions.find((item) => item.id === question.question_id).score;
         });
         quiz.score = score;
     });
-    console.log(state.quizzes);
+
+    // remove quizzes with no questions
+    state.quizzes = state.quizzes.filter((quiz) => quiz.score > 0);
 };
 
 onMounted(async () => {
@@ -109,12 +112,12 @@ onMounted(async () => {
 
         // fetch quizzes
         response = await api.get('/quizzes');
-        state.quizzes = response.data.data;
+        state.quizzes = response.data.data.reverse();
         updateScopeNames();
 
         // set quiz display
         const quizDisplay = {};
-        state.quizzes.forEach((quiz) => quizDisplay[quiz.id] = quiz.scope === 'subject');
+        state.quizzes.forEach((quiz) => quizDisplay[quiz.id] = quiz.scope === filter.quizType);
         state.quizDisplay = quizDisplay;
 
         // fetch questions
@@ -137,12 +140,13 @@ onMounted(async () => {
         <div>
             <h3 class="text-center">Filter</h3>
             <div class="d-flex my-4 mx-auto justify-content-evenly align-items-center">
+
                 <!-- quiz type -->
                 <div class="d-flex align-items-center">
                     <label class="lead me-2">Quiz Type:</label>
                     <div class="btn-group" role="group">
                         <input type="radio" class="btn-check" id="btncheck1" v-model="filter.quizType"
-                        checked value="subject">
+                        value="subject">
                         <label class="btn btn-outline-primary" for="btncheck1">Subject</label>
 
                         <input type="radio" class="btn-check" id="btncheck2" v-model="filter.quizType"
@@ -184,6 +188,7 @@ onMounted(async () => {
 
         <Card heading="Quizzes">
             <table class="table table-hover align-middle">
+
                 <!-- table head -->
                 <thead>
                     <tr>

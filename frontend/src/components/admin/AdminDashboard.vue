@@ -23,7 +23,6 @@ window.showToast("Successfully Logged In", 'success', "Welcome Admin");
 const updateAdminPassword = async () => {
     try {
         const response = await api.post('/admin-creds', {password: state.adminPassword});
-        console.log(response.data);
         window.showToast("Password Successfully Updates", 'success', "You can now login with your New Password")
         document.getElementById('edit-menu-close').click();
     } catch (error) {

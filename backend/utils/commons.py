@@ -43,3 +43,8 @@ def save_profile_pic(profile, user):
 
 def get(date) -> str:
     return str(date or '')
+
+def get_mail_creds() -> dict:
+    with open('data/mail-creds.json', 'r') as f:
+        creds = json.load(f)
+    return creds

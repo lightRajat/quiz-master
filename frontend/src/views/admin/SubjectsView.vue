@@ -24,9 +24,7 @@ const editData = async (id) => {
     if (!subject.editable) {
         try {
             const { editable: value, ...dataToSend } = subject;
-            console.log(dataToSend);
             const response = await api.put(`/subject/${id}`, dataToSend);
-            console.log(response.data);
             window.showToast("Subject Successfully Updated", 'success');
         } catch (error) {
             console.log(error.response.data);
@@ -62,7 +60,7 @@ onMounted(async () => {
     try {
         // fetch subjects
         const response = await api.get('/subjects');
-        state.subjects = response.data.data;
+        state.subjects = response.data.data.reverse();
         state.subjects.forEach((item) => item.editable = false);
     } catch (error) {
         console.log(error);
@@ -74,6 +72,8 @@ onMounted(async () => {
     <div class="m-5">
         <Card heading="All Subjects" :btn="btnData">
             <table class="table table-striped table-hover align-middle">
+
+                <!-- table head -->
                 <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -82,6 +82,8 @@ onMounted(async () => {
                         <th scope="col">Action</th>
                     </tr>
                 </thead>
+
+                <!-- table body -->
                 <tbody class="table-group-divider">
                     <tr v-for="(row, rowIndex) in state.subjects" :key="rowIndex">
                         <th scope="row">{{ rowIndex + 1 }}</th>

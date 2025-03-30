@@ -49,11 +49,14 @@ const scopeDist = ref({
             },
             title: {
                 display: true,
-                text: "Quiz Attempts in Subject vs Chapter Scopes",
+                text: ["Quiz Attempts by Scope", ''],
             },
             datalabels: {
                 formatter: (value, context) => {
-                    return `${context.chart.data.labels[context.dataIndex]}\n${getPercentage(value, state.attempts.length)}% (${value})`;
+                    if (value != 0) {
+                        return `${context.chart.data.labels[context.dataIndex]}\n${getPercentage(value, state.attempts.length)}% (${value})`;
+                    }
+                    return null;
                 },
             },
         },
@@ -87,6 +90,11 @@ const dayAttemptedDist = ref({
                 text: 'Quiz Attempts Across Week Days',
                 align: "center",
                 padding: { bottom: 10 },
+            },
+            datalabels: {
+                formatter: (value, context) => {
+                    return (value != 0 ? value : null);
+                },
             },
         },
         scales: {
@@ -153,6 +161,7 @@ onMounted(async () => {
         
         // update scope counts in pie chart
         scopeDist.value.data.datasets[0].data = [state.scopeCount.subject, state.scopeCount.chapter];
+        scopeDist.value.options.plugins.title.text[1] = `(Total: ${state.scopeCount.subject + state.scopeCount.chapter})`
         scopeDist.value.visible = true;
 
         // update dayAttempted counts in bar graph

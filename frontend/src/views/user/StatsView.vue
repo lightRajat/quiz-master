@@ -54,7 +54,10 @@ const trueAnswerDist = ref({
             },
             datalabels: {
                 formatter: (value, context) => {
-                    return `${context.chart.data.labels[context.dataIndex]}\n${getPercentage(value, state.answersCount.total)}% (${value})`;
+                    if (value != 0) {
+                        return `${context.chart.data.labels[context.dataIndex]}\n${getPercentage(value, state.answersCount.total)}% (${value})`;
+                    }
+                    return null;
                 },
             },
         },

@@ -73,10 +73,15 @@ onMounted(async () => {
 <template>
     <div class="m-5">
         <Card heading="Your Quiz Attempts">
-            <button @click="downloadData" class="btn btn-primary download-btn">
+
+            <!-- download button -->
+            <button @click="downloadData" class="btn btn-primary download-btn"
+            :disabled="!state.attempts.length">
                 <i class="bi bi-download me-1"></i>
                 Download Data as CSV
             </button>
+
+            <!-- table -->
             <table class="table table-striped table-hover align-middle">
                 <!-- table head -->
                 <thead>
@@ -112,8 +117,12 @@ onMounted(async () => {
                             <span class="score">{{ attempt.score }}</span>
                             /<span class="total-score">{{ attempt.total_score }}</span>
                         </td>
+
+                        <!-- date -->
                         <td>{{ attempt.date_attempted }}</td>
-                        <td class="d-flex">
+
+                        <!-- action -->
+                        <td>
                             <RouterLink :to="`/user/${getCurrentUser()}/attempt/${attempt.id}`"
                             class="btn btn-primary d-flex me-3"
                             style="width: fit-content;">

@@ -27,9 +27,7 @@ const editData = async (id) => {
     if (!chapter.editable) {
         try {
             const { editable: value, ...dataToSend } = chapter;
-            console.log(dataToSend);
             const response = await api.put(`/chapter/${id}`, dataToSend);
-            console.log(response.data);
             window.showToast("Chapter Successfully Updated", 'success');
         } catch (error) {
             console.log(error.response?.data || error);
@@ -68,7 +66,7 @@ onMounted(async () => {
     try {
         // fetch chapters
         let response = await api.get(`/chapters?subject_id=${state.subject.id}`);
-        state.chapters = response.data.data;
+        state.chapters = response.data.data.reverse();
         state.chapters.forEach((item) => item.editable = false);
 
         // fetch subject name

@@ -15,7 +15,6 @@ const deleteData = async (id) => {
         const resourceName = props.resourceType[0].toUpperCase() + props.resourceType.slice(1)
         try {
             const response = await api.delete(`/${props.resourceType}/${props.id}`);
-            console.log(response.data);
             emit('deleteSuccess', props.id);
             window.showToast(`${resourceName} Successfully Deleted`, 'success');
         } catch (error) {

@@ -54,9 +54,9 @@ class ChapterApi(Resource, UpdateMixin, PostMixin, DeleteMixin):
         else:
             subject_id = request.args.get('subject_id')
             if subject_id:
-                results = models.Chapter.query.filter_by(subject_id=subject_id).all()
+                results = models.Chapter.query.filter_by(subject_id=subject_id).order_by(models.Chapter.id).all()
             else:
-                results = models.Chapter.query.all()
+                results = models.Chapter.query.order_by(models.Chapter.id).all()
             chapters = []
             for result in results:
                 chapter = {
