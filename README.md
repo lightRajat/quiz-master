@@ -1,6 +1,6 @@
 # Quiz Master
 
-It is a multi-user app (one requires an administrator and other users) that acts as an exam preparation site for multiple courses.
+A multi-user app that lets users to attempt quizzes set by the admin.
 
 ## Technologies Used
 
