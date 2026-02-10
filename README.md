@@ -2,6 +2,16 @@
 
 A multi-user app that lets users to attempt quizzes set by the admin.
 
+## Preview
+
+### User POV
+
+<video src="https://github.com/user-attachments/assets/c1591a9c-e060-4e9b-a817-95cc1064dc22" controls title="User Demo"></video>
+
+### Admin POV
+
+<video src="https://github.com/user-attachments/assets/131cea70-8289-4568-9a1d-8ce3af93da32" controls title="Admin Demo"></video>
+
 ## Technologies Used
 
 1. `Vue` : as the frontend framework
