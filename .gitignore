@@ -5,4 +5,4 @@ backend/data/admin-creds.json
 backend/data/profile-pics/
 **/.vscode/
 frontend/node_modules
-frontend/package-lock.json
+backend/venv/
